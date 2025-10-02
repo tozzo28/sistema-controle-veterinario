@@ -35,7 +35,7 @@ exports.handler = async (event, context) => {
       const data = JSON.parse(event.body);
       const result = await client.query(`
         INSERT INTO leishmaniasis_cases 
-        (nome_animal, tipo_animal, idade, raca, sexo, pelagem, cor_pelagem, nome_tutor, status, area, quadra, cpf, telefone, endereco, data_notificacao)
+        ("nomeAnimal", "tipoAnimal", "idade", "raca", "sexo", "pelagem", "corPelagem", "nomeTutor", "status", "area", "quadra", "cpf", "telefone", "endereco", "dataNotificacao")
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
         RETURNING *
       `, [

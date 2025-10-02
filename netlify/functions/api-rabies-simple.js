@@ -35,13 +35,12 @@ exports.handler = async (event, context) => {
       const data = JSON.parse(event.body);
       const result = await client.query(`
         INSERT INTO rabies_vaccine_records 
-        (nome_animal, tipo, idade, raca, sexo, nome_tutor, cpf, telefone, endereco, data_vacinacao, local_vacinacao, lote_vacina, veterinario, clinica, quadra, area, dose_perdida)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+        ("nomeAnimal", "tipo", "nomeTutor", "cpf", "telefone", "endereco", "dataVacinacao", "localVacinacao", "loteVacina", "veterinario", "clinica", "quadra", "area", "dosePerdida")
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
         RETURNING *
       `, [
-        data.nomeAnimal, data.tipo, data.idade, data.raca, data.sexo,
-        data.nomeTutor, data.cpf, data.telefone, data.endereco, new Date(),
-        data.localVacinacao, data.loteVacina, data.veterinario, data.clinica,
+        data.nomeAnimal, data.tipo, data.nomeTutor, data.cpf, data.telefone, data.endereco, 
+        new Date(), data.localVacinacao, data.loteVacina, data.veterinario, data.clinica,
         data.quadra, data.area, data.dosePerdida || false
       ]);
       

@@ -26,11 +26,11 @@ exports.handler = async (event, context) => {
     const totalResult = await client.query('SELECT COUNT(*) as count FROM rabies_vaccine_records');
     const caesResult = await client.query("SELECT COUNT(*) as count FROM rabies_vaccine_records WHERE tipo = 'cao'");
     const gatosResult = await client.query("SELECT COUNT(*) as count FROM rabies_vaccine_records WHERE tipo = 'gato'");
-    const dosesPerdidasResult = await client.query('SELECT COUNT(*) as count FROM rabies_vaccine_records WHERE dose_perdida = true');
+    const dosesPerdidasResult = await client.query('SELECT COUNT(*) as count FROM rabies_vaccine_records WHERE "dosePerdida" = true');
     
-    const centroResult = await client.query("SELECT COUNT(*) as count FROM rabies_vaccine_records WHERE local_vacinacao = 'centro_municipal'");
-    const clinicaResult = await client.query("SELECT COUNT(*) as count FROM rabies_vaccine_records WHERE local_vacinacao = 'clinica_pet_care'");
-    const hospitalResult = await client.query("SELECT COUNT(*) as count FROM rabies_vaccine_records WHERE local_vacinacao = 'hospital_sao_francisco'");
+    const centroResult = await client.query("SELECT COUNT(*) as count FROM rabies_vaccine_records WHERE \"localVacinacao\" = 'centro_municipal'");
+    const clinicaResult = await client.query("SELECT COUNT(*) as count FROM rabies_vaccine_records WHERE \"localVacinacao\" = 'clinica_pet_care'");
+    const hospitalResult = await client.query("SELECT COUNT(*) as count FROM rabies_vaccine_records WHERE \"localVacinacao\" = 'hospital_sao_francisco'");
     
     const stats = {
       total: parseInt(totalResult.rows[0].count),
