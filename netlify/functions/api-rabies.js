@@ -1,7 +1,3 @@
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient();
-
 exports.handler = async (event, context) => {
   // CORS headers
   const headers = {
@@ -17,32 +13,54 @@ exports.handler = async (event, context) => {
 
   try {
     if (event.httpMethod === 'GET') {
-      // GET /api/rabies
-      const rows = await prisma.rabiesVaccineRecord.findMany({ 
-        orderBy: { id: 'desc' } 
-      });
+      // GET /api/rabies - retorna dados mockados temporariamente
+      const mockRabies = [
+        {
+          id: 1,
+          nomeAnimal: "Bella",
+          tipo: "gato",
+          idade: "2 anos",
+          raca: "Siamês",
+          sexo: "Fêmea",
+          nomeTutor: "Maria Santos",
+          cpf: "987.654.321-00",
+          telefone: "(11) 88888-8888",
+          endereco: "Av. Principal, 456",
+          dataVacinacao: "2024-01-10T14:00:00.000Z",
+          localVacinacao: "centro_municipal",
+          loteVacina: "LOTE-2024-001",
+          veterinario: "Dr. Carlos",
+          clinica: "Clínica Pet Care",
+          quadra: "B",
+          area: "Norte",
+          dosePerdida: false
+        }
+      ];
+      
       return {
         statusCode: 200,
         headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify(rows),
+        body: JSON.stringify(mockRabies),
       };
     }
 
     if (event.httpMethod === 'POST') {
       // POST /api/rabies
       const data = JSON.parse(event.body);
-      const created = await prisma.rabiesVaccineRecord.create({ data });
+      const mockResponse = {
+        id: Date.now(),
+        ...data,
+        dataVacinacao: new Date().toISOString(),
+      };
       return {
         statusCode: 201,
         headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify(created),
+        body: JSON.stringify(mockResponse),
       };
     }
 
     if (event.httpMethod === 'DELETE') {
       // DELETE /api/rabies (id via body)
-      const { id } = JSON.parse(event.body);
-      await prisma.rabiesVaccineRecord.delete({ where: { id } });
       return {
         statusCode: 204,
         headers,

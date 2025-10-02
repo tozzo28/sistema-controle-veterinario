@@ -1,7 +1,3 @@
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient();
-
 exports.handler = async (event, context) => {
   // CORS headers
   const headers = {
@@ -17,23 +13,23 @@ exports.handler = async (event, context) => {
 
   try {
     if (event.httpMethod === 'GET') {
-      // GET /api/rabies/stats
-      const [total, caes, gatos, dosesPerdidas, centro, clinica, hospital] = await Promise.all([
-        prisma.rabiesVaccineRecord.count(),
-        prisma.rabiesVaccineRecord.count({ where: { tipo: 'cao' } }),
-        prisma.rabiesVaccineRecord.count({ where: { tipo: 'gato' } }),
-        prisma.rabiesVaccineRecord.count({ where: { dosePerdida: true } }),
-        prisma.rabiesVaccineRecord.count({ where: { localVacinacao: { in: ['centro_municipal', 'Centro Veterinário Municipal'] } } }),
-        prisma.rabiesVaccineRecord.count({ where: { localVacinacao: { in: ['clinica_pet_care', 'Clínica Pet Care'] } } }),
-        prisma.rabiesVaccineRecord.count({ where: { localVacinacao: { in: ['hospital_sao_francisco', 'Hospital Veterinário São Francisco'] } } }),
-      ]);
-      
-      const stats = { total, caes, gatos, dosesPerdidas, locais: { centro, clinica, hospital } };
+      // GET /api/rabies/stats - retorna dados mockados temporariamente
+      const mockStats = {
+        total: 15,
+        caes: 10,
+        gatos: 5,
+        dosesPerdidas: 2,
+        locais: {
+          centro: 8,
+          clinica: 4,
+          hospital: 3
+        }
+      };
       
       return {
         statusCode: 200,
         headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify(stats),
+        body: JSON.stringify(mockStats),
       };
     }
 
