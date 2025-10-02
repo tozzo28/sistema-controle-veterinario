@@ -1,0 +1,7 @@
+[build]
+  command = "npx prisma generate && npm run build"
+  functions = "netlify/functions"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "18"

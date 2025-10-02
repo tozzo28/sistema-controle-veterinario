@@ -1,4 +1,8 @@
+const { PrismaClient } = require('@prisma/client');
+
 exports.handler = async (event, context) => {
+  const prisma = new PrismaClient();
+  
   // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -13,52 +17,40 @@ exports.handler = async (event, context) => {
 
   try {
     if (event.httpMethod === 'GET') {
-      // GET /api/cases - retorna dados mockados temporariamente
-      const mockCases = [
-        {
-          id: 1,
-          nomeAnimal: "Rex",
-          tipoAnimal: "cão",
-          idade: "3 anos",
-          raca: "Pastor Alemão",
-          sexo: "Macho",
-          pelagem: "Curta",
-          corPelagem: "Preto",
-          nomeTutor: "João Silva",
-          status: "Ativo",
-          area: "Centro",
-          quadra: "A",
-          dataNotificacao: "2024-01-15T10:30:00.000Z",
-          cpf: "123.456.789-00",
-          telefone: "(11) 99999-9999",
-          endereco: "Rua das Flores, 123"
-        }
-      ];
+      // GET /api/cases
+      const cases = await prisma.leishmaniasisCase.findMany({
+        orderBy: { id: 'desc' },
+      });
       
       return {
         statusCode: 200,
         headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify(mockCases),
+        body: JSON.stringify(cases),
       };
     }
 
     if (event.httpMethod === 'POST') {
       // POST /api/cases
       const data = JSON.parse(event.body);
-      const mockResponse = {
-        id: Date.now(),
-        ...data,
-        dataNotificacao: new Date().toISOString(),
-      };
+      const created = await prisma.leishmaniasisCase.create({ 
+        data: {
+          ...data,
+          dataNotificacao: new Date()
+        }
+      });
+      
       return {
         statusCode: 201,
         headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify(mockResponse),
+        body: JSON.stringify(created),
       };
     }
 
     if (event.httpMethod === 'DELETE') {
       // DELETE /api/cases (id via body)
+      const { id } = JSON.parse(event.body);
+      await prisma.leishmaniasisCase.delete({ where: { id } });
+      
       return {
         statusCode: 204,
         headers,
@@ -76,7 +68,12 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 500,
       headers: { ...headers, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Internal server error' }),
+      body: JSON.stringify({ 
+        error: 'Internal server error', 
+        details: error.message 
+      }),
     };
+  } finally {
+    await prisma.$disconnect();
   }
 };

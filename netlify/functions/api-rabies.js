@@ -1,4 +1,8 @@
+const { PrismaClient } = require('@prisma/client');
+
 exports.handler = async (event, context) => {
+  const prisma = new PrismaClient();
+  
   // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -13,54 +17,40 @@ exports.handler = async (event, context) => {
 
   try {
     if (event.httpMethod === 'GET') {
-      // GET /api/rabies - retorna dados mockados temporariamente
-      const mockRabies = [
-        {
-          id: 1,
-          nomeAnimal: "Bella",
-          tipo: "gato",
-          idade: "2 anos",
-          raca: "Siamês",
-          sexo: "Fêmea",
-          nomeTutor: "Maria Santos",
-          cpf: "987.654.321-00",
-          telefone: "(11) 88888-8888",
-          endereco: "Av. Principal, 456",
-          dataVacinacao: "2024-01-10T14:00:00.000Z",
-          localVacinacao: "centro_municipal",
-          loteVacina: "LOTE-2024-001",
-          veterinario: "Dr. Carlos",
-          clinica: "Clínica Pet Care",
-          quadra: "B",
-          area: "Norte",
-          dosePerdida: false
-        }
-      ];
+      // GET /api/rabies
+      const rabies = await prisma.rabiesVaccineRecord.findMany({
+        orderBy: { id: 'desc' },
+      });
       
       return {
         statusCode: 200,
         headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify(mockRabies),
+        body: JSON.stringify(rabies),
       };
     }
 
     if (event.httpMethod === 'POST') {
       // POST /api/rabies
       const data = JSON.parse(event.body);
-      const mockResponse = {
-        id: Date.now(),
-        ...data,
-        dataVacinacao: new Date().toISOString(),
-      };
+      const created = await prisma.rabiesVaccineRecord.create({ 
+        data: {
+          ...data,
+          dataVacinacao: new Date()
+        }
+      });
+      
       return {
         statusCode: 201,
         headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify(mockResponse),
+        body: JSON.stringify(created),
       };
     }
 
     if (event.httpMethod === 'DELETE') {
       // DELETE /api/rabies (id via body)
+      const { id } = JSON.parse(event.body);
+      await prisma.rabiesVaccineRecord.delete({ where: { id } });
+      
       return {
         statusCode: 204,
         headers,
@@ -78,7 +68,12 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 500,
       headers: { ...headers, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Internal server error' }),
+      body: JSON.stringify({ 
+        error: 'Internal server error', 
+        details: error.message 
+      }),
     };
+  } finally {
+    await prisma.$disconnect();
   }
 };
