@@ -65,14 +65,14 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold text-gray-900">Dashboard</h2>
-        <div className="text-sm text-gray-500">
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
+        <div className="text-sm text-gray-500 dark:text-gray-400">
           Último update: {new Date().toLocaleDateString('pt-BR')}
         </div>
       </div>
 
       <section>
-        <h3 className="text-xl font-semibold text-gray-900 mb-6">Controle de Leishmaniose</h3>
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Controle de Leishmaniose</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {leishmaniasisStats.map((stat, index) => (
             <StatCard key={index} {...stat} />
@@ -81,7 +81,7 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
       </section>
 
       <section>
-        <h3 className="text-xl font-semibold text-gray-900 mb-6">Vacina Antirrábica</h3>
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Vacina Antirrábica</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {rabiesCards.map((stat, index) => (
             <StatCard key={index} {...stat} />
