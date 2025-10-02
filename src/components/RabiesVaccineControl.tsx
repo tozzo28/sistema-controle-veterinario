@@ -8,6 +8,7 @@ const RabiesVaccineControl: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
+  const [onlyLost, setOnlyLost] = useState(false);
 
   const [stats, setStats] = useState({ total: 0, caes: 0, gatos: 0, dosesPerdidas: 0, locais: { centro: 0, clinica: 0, hospital: 0 } });
 
@@ -103,9 +104,19 @@ const RabiesVaccineControl: React.FC = () => {
               <option value="gato">Gatos</option>
             </select>
           </div>
+
+          <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+            <input
+              type="checkbox"
+              checked={onlyLost}
+              onChange={(e) => setOnlyLost(e.target.checked)}
+              className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+            />
+            Apenas doses perdidas
+          </label>
         </div>
 
-        <RabiesVaccineList searchTerm={searchTerm} filterType={filterType} />
+        <RabiesVaccineList searchTerm={searchTerm} filterType={filterType} onlyLost={onlyLost} />
       </div>
     </div>
   );

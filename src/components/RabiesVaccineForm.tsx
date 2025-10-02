@@ -27,6 +27,7 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
     loteVacina: '',
     veterinario: '',
     clinica: '',
+    dosePerdida: false,
     
     // Georreferenciamento
     quadra: '',
@@ -45,6 +46,7 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
         area: formData.area,
         quadra: formData.quadra,
         loteVacina: formData.loteVacina,
+        dosePerdida: !!formData.dosePerdida,
       };
       await createRabies(payload);
       onClose();
@@ -266,6 +268,19 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   required
                 />
+              </div>
+
+              <div className="flex items-center mt-2">
+                <input
+                  id="dosePerdida"
+                  type="checkbox"
+                  checked={formData.dosePerdida}
+                  onChange={(e) => setFormData({ ...formData, dosePerdida: e.target.checked })}
+                  className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                />
+                <label htmlFor="dosePerdida" className="ml-2 block text-sm text-gray-700">
+                  Dose perdida
+                </label>
               </div>
             </div>
           </section>

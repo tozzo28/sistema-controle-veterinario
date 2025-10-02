@@ -5,9 +5,10 @@ import { fetchRabies, deleteRabies, RabiesVaccineRecord } from '../api';
 interface RabiesVaccineListProps {
   searchTerm: string;
   filterType: string;
+  onlyLost?: boolean;
 }
 
-const RabiesVaccineList: React.FC<RabiesVaccineListProps> = ({ searchTerm, filterType }) => {
+const RabiesVaccineList: React.FC<RabiesVaccineListProps> = ({ searchTerm, filterType, onlyLost = false }) => {
   const [rows, setRows] = useState<RabiesVaccineRecord[]>([]);
 
   useEffect(() => {
@@ -52,13 +53,9 @@ const RabiesVaccineList: React.FC<RabiesVaccineListProps> = ({ searchTerm, filte
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {rows
-            .filter(v =>
-              (filterType === 'all' || v.tipo === filterType) &&
-              (
-                v.nomeAnimal.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                v.nomeTutor.toLowerCase().includes(searchTerm.toLowerCase())
-              )
-            )
+            .filter(v => (filterType === 'all' || v.tipo === filterType))
+            .filter(v => (!onlyLost || v.dosePerdida === true))
+            .filter(v => v.nomeAnimal.toLowerCase().includes(searchTerm.toLowerCase()) || v.nomeTutor.toLowerCase().includes(searchTerm.toLowerCase()))
             .map((vacinacao) => (
             <tr key={vacinacao.id} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap">
@@ -87,9 +84,16 @@ const RabiesVaccineList: React.FC<RabiesVaccineListProps> = ({ searchTerm, filte
                 Área {vacinacao.area} - {vacinacao.quadra}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                  {vacinacao.loteVacina}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                    {vacinacao.loteVacina}
+                  </span>
+                  {vacinacao.dosePerdida === true && (
+                    <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">
+                      Dose perdida
+                    </span>
+                  )}
+                </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div className="flex space-x-2">
