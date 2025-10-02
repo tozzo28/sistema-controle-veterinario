@@ -34,11 +34,11 @@ exports.handler = async (event, context) => {
     // Inserir dados de exemplo para vacinas antirrábicas
     await client.query(`
       INSERT INTO rabies_vaccine_records 
-      ("nomeAnimal", "tipo", "nomeTutor", "cpf", "telefone", "endereco", "localVacinacao", "loteVacina", "veterinario", "clinica", "quadra", "area", "dosePerdida")
+      ("nomeAnimal", "tipo", "nomeTutor", "localVacinacao", "loteVacina", "quadra", "area", "dosePerdida")
       VALUES 
-      ('Bella', 'gato', 'Maria Santos', '987.654.321-00', '(11) 88888-8888', 'Av. Principal, 456', 'centro_municipal', 'LOTE-2024-001', 'Dr. Carlos', 'Clínica Pet Care', 'B', 'Norte', false),
-      ('Rex', 'cão', 'João Silva', '123.456.789-00', '(11) 99999-9999', 'Rua das Flores, 123', 'clinica_pet_care', 'LOTE-2024-002', 'Dr. Ana', 'Clínica Pet Care', 'A', 'Centro', false),
-      ('Max', 'cão', 'Pedro Costa', '456.789.123-00', '(11) 77777-7777', 'Rua do Sol, 789', 'hospital_sao_francisco', 'LOTE-2024-003', 'Dr. Roberto', 'Hospital São Francisco', 'C', 'Sul', true)
+      ('Bella', 'gato', 'Maria Santos', 'centro_municipal', 'LOTE-2024-001', 'B', 'Norte', false),
+      ('Rex', 'cão', 'João Silva', 'clinica_pet_care', 'LOTE-2024-002', 'A', 'Centro', false),
+      ('Max', 'cão', 'Pedro Costa', 'hospital_sao_francisco', 'LOTE-2024-003', 'C', 'Sul', true)
     `);
     
     // Verificar contagem final
