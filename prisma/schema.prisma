@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model LeishmaniasisCase {
+  id               Int      @id @default(autoincrement())
+  nomeAnimal       String
+  tipoAnimal       String
+  idade            String?
+  raca             String?
+  sexo             String?
+  pelagem          String?
+  corPelagem       String?
+  nomeTutor        String
+  status           String
+  area             String
+  quadra           String
+  dataNotificacao  DateTime @default(now())
+  cpf              String?
+  telefone         String?
+  endereco         String?
+  @@map("leishmaniasis_cases")
+}
+
+model RabiesVaccineRecord {
+  id              Int      @id @default(autoincrement())
+  nomeAnimal      String
+  tipo            String   // "cao" | "gato"
+  nomeTutor       String
+  dataVacinacao   DateTime @default(now())
+  localVacinacao  String
+  area            String
+  quadra          String
+  loteVacina      String
+  dosePerdida     Boolean  @default(false)
+
+  @@map("rabies_vaccine_records")
+}
+
