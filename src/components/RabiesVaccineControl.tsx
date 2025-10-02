@@ -13,7 +13,7 @@ const RabiesVaccineControl: React.FC = () => {
   const [stats, setStats] = useState({ total: 0, caes: 0, gatos: 0, dosesPerdidas: 0, locais: { centro: 0, clinica: 0, hospital: 0 } });
 
   useEffect(() => {
-    fetch('/api/rabies/stats').then(r => r.json()).then(setStats).catch(() => setStats({ total: 0, caes: 0, gatos: 0, dosesPerdidas: 0, locais: { centro: 0, clinica: 0, hospital: 0 } }));
+    fetch('/.netlify/functions/api-rabies-stats').then(r => r.json()).then(setStats).catch(() => setStats({ total: 0, caes: 0, gatos: 0, dosesPerdidas: 0, locais: { centro: 0, clinica: 0, hospital: 0 } }));
   }, []);
 
   return (

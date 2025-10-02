@@ -40,8 +40,8 @@ exports.handler = async (event, context) => {
     }
 
     if (event.httpMethod === 'DELETE') {
-      // DELETE /api/rabies/:id
-      const id = parseInt(event.path.split('/').pop());
+      // DELETE /api/rabies (id via body)
+      const { id } = JSON.parse(event.body);
       await prisma.rabiesVaccineRecord.delete({ where: { id } });
       return {
         statusCode: 204,

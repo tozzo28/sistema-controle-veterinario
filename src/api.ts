@@ -20,13 +20,13 @@ export type LeishmaniasisCase = {
 const BASE_URL = import.meta.env.VITE_API_URL || '';
 
 export async function fetchCases(): Promise<LeishmaniasisCase[]> {
-  const res = await fetch(`${BASE_URL}/api/cases`);
+  const res = await fetch(`${BASE_URL}/.netlify/functions/api-cases`);
   if (!res.ok) throw new Error('Falha ao carregar casos');
   return res.json();
 }
 
 export async function createCase(data: Omit<LeishmaniasisCase, 'id' | 'dataNotificacao'>): Promise<LeishmaniasisCase> {
-  const res = await fetch(`${BASE_URL}/api/cases`, {
+  const res = await fetch(`${BASE_URL}/.netlify/functions/api-cases`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -36,7 +36,11 @@ export async function createCase(data: Omit<LeishmaniasisCase, 'id' | 'dataNotif
 }
 
 export async function deleteCase(id: number): Promise<void> {
-  const res = await fetch(`${BASE_URL}/api/cases/${id}`, { method: 'DELETE' });
+  const res = await fetch(`${BASE_URL}/.netlify/functions/api-cases`, { 
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id })
+  });
   if (!res.ok && res.status !== 204) throw new Error('Falha ao excluir caso');
 }
 
@@ -54,13 +58,13 @@ export type RabiesVaccineRecord = {
 };
 
 export async function fetchRabies(): Promise<RabiesVaccineRecord[]> {
-  const res = await fetch(`${BASE_URL}/api/rabies`);
+  const res = await fetch(`${BASE_URL}/.netlify/functions/api-rabies`);
   if (!res.ok) throw new Error('Falha ao carregar vacinações');
   return res.json();
 }
 
 export async function createRabies(data: Omit<RabiesVaccineRecord, 'id' | 'dataVacinacao'>): Promise<RabiesVaccineRecord> {
-  const res = await fetch(`${BASE_URL}/api/rabies`, {
+  const res = await fetch(`${BASE_URL}/.netlify/functions/api-rabies`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -70,7 +74,11 @@ export async function createRabies(data: Omit<RabiesVaccineRecord, 'id' | 'dataV
 }
 
 export async function deleteRabies(id: number): Promise<void> {
-  const res = await fetch(`${BASE_URL}/api/rabies/${id}`, { method: 'DELETE' });
+  const res = await fetch(`${BASE_URL}/.netlify/functions/api-rabies`, { 
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id })
+  });
   if (!res.ok && res.status !== 204) throw new Error('Falha ao excluir vacinação');
 }
 

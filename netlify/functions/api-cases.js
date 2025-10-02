@@ -40,8 +40,8 @@ exports.handler = async (event, context) => {
     }
 
     if (event.httpMethod === 'DELETE') {
-      // DELETE /api/cases/:id
-      const id = parseInt(event.path.split('/').pop());
+      // DELETE /api/cases (id via body)
+      const { id } = JSON.parse(event.body);
       await prisma.leishmaniasisCase.delete({ where: { id } });
       return {
         statusCode: 204,
