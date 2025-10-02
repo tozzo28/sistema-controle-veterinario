@@ -22,7 +22,7 @@ exports.handler = async (event, context) => {
     await client.connect();
     
     if (event.httpMethod === 'GET') {
-      const result = await client.query('SELECT * FROM leishmaniasis_cases ORDER BY id DESC');
+      const result = await client.query('SELECT * FROM rabies_vaccine_records ORDER BY id DESC');
       
       return {
         statusCode: 200,
@@ -34,14 +34,15 @@ exports.handler = async (event, context) => {
     if (event.httpMethod === 'POST') {
       const data = JSON.parse(event.body);
       const result = await client.query(`
-        INSERT INTO leishmaniasis_cases 
-        (nome_animal, tipo_animal, idade, raca, sexo, pelagem, cor_pelagem, nome_tutor, status, area, quadra, cpf, telefone, endereco, data_notificacao)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+        INSERT INTO rabies_vaccine_records 
+        (nome_animal, tipo, idade, raca, sexo, nome_tutor, cpf, telefone, endereco, data_vacinacao, local_vacinacao, lote_vacina, veterinario, clinica, quadra, area, dose_perdida)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
         RETURNING *
       `, [
-        data.nomeAnimal, data.tipoAnimal, data.idade, data.raca, data.sexo,
-        data.pelagem, data.corPelagem, data.nomeTutor, data.status, data.area,
-        data.quadra, data.cpf, data.telefone, data.endereco, new Date()
+        data.nomeAnimal, data.tipo, data.idade, data.raca, data.sexo,
+        data.nomeTutor, data.cpf, data.telefone, data.endereco, new Date(),
+        data.localVacinacao, data.loteVacina, data.veterinario, data.clinica,
+        data.quadra, data.area, data.dosePerdida || false
       ]);
       
       return {
@@ -53,7 +54,7 @@ exports.handler = async (event, context) => {
     
     if (event.httpMethod === 'DELETE') {
       const { id } = JSON.parse(event.body);
-      await client.query('DELETE FROM leishmaniasis_cases WHERE id = $1', [id]);
+      await client.query('DELETE FROM rabies_vaccine_records WHERE id = $1', [id]);
       
       return {
         statusCode: 204,

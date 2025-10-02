@@ -24,7 +24,7 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
   const [rabiesStats, setRabiesStats] = useState({ total: 0, caes: 0, gatos: 0, dosesPerdidas: 0 });
 
   useEffect(() => {
-    fetch('/.netlify/functions/api-rabies-stats')
+    fetch('/.netlify/functions/api-rabies-stats-simple')
       .then(r => r.ok ? r.json() : Promise.reject())
       .then((data) => setRabiesStats({ total: data.total, caes: data.caes, gatos: data.gatos, dosesPerdidas: data.dosesPerdidas }))
       .catch(() => setRabiesStats({ total: 0, caes: 0, gatos: 0, dosesPerdidas: 0 }));
