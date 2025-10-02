@@ -14,7 +14,7 @@ const ThemeToggle: React.FC = () => {
       {theme === 'light' ? (
         <>
           <Moon className="w-4 h-4 text-gray-800 dark:text-gray-300" />
-          <span className="text-sm font-semibold text-gray-800 dark:text-gray-300">Escuro</span>
+          <span className="text-sm font-semibold text-black dark:text-gray-300">Escuro</span>
         </>
       ) : (
         <>
