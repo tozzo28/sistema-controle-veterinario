@@ -1,7 +1,10 @@
 const { PrismaClient } = require('@prisma/client');
 
 exports.handler = async (event, context) => {
-  const prisma = new PrismaClient();
+  let prisma;
+  
+  try {
+    prisma = new PrismaClient();
   
   // CORS headers
   const headers = {
@@ -72,6 +75,8 @@ exports.handler = async (event, context) => {
       }),
     };
   } finally {
-    await prisma.$disconnect();
+    if (prisma) {
+      await prisma.$disconnect();
+    }
   }
 };
