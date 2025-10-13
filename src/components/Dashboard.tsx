@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AlertTriangle, Syringe, Activity, Shield } from 'lucide-react';
 import StatCard from './StatCard';
+import Charts from './Charts';
 
 interface LeishmaniasisCase {
   id: number;
@@ -89,28 +90,34 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
         </div>
       </section>
 
+      {/* Gráficos de Distribuição */}
       <section>
-        <h3 className="text-xl font-semibold text-gray-900 mb-6">Resumo das Atividades</h3>
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Análise de Distribuição</h3>
+        <Charts leishmaniasisCases={leishmaniasisCases} />
+      </section>
+
+      <section>
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Resumo das Atividades</h3>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h4 className="text-lg font-medium text-gray-900 mb-4">Casos Recentes de Leishmaniose</h4>
+              <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Casos Recentes de Leishmaniose</h4>
               {leishmaniasisCases.length > 0 ? (
                 <div className="space-y-3">
                   {leishmaniasisCases.slice(0, 5).map((case_) => (
-                    <div key={case_.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                    <div key={case_.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
                       <div>
-                        <p className="font-medium text-gray-900">{case_.nomeAnimal}</p>
-                        <p className="text-sm text-gray-500">{case_.nomeTutor}</p>
-                        <p className="text-xs text-gray-400 capitalize">
+                        <p className="font-medium text-gray-900 dark:text-white">{case_.nomeAnimal}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{case_.nomeTutor}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 capitalize">
                           {case_.tipoAnimal === 'cao' ? 'Cão' : case_.tipoAnimal === 'gato' ? 'Gato' : 'Outro'}
                         </p>
                       </div>
                       <span className={`px-2 py-1 text-xs rounded-full ${
-                        case_.status === 'positivo' ? 'bg-red-100 text-red-800' :
-                        case_.status === 'negativo' ? 'bg-green-100 text-green-800' :
-                        case_.status === 'tratamento' ? 'bg-blue-100 text-blue-800' :
-                        'bg-yellow-100 text-yellow-800'
+                        case_.status === 'positivo' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                        case_.status === 'negativo' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                        case_.status === 'tratamento' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
                       }`}>
                         {case_.status === 'positivo' ? 'Positivo' :
                          case_.status === 'negativo' ? 'Negativo' :
@@ -121,50 +128,50 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500">Nenhum caso registrado ainda.</p>
+                <p className="text-gray-500 dark:text-gray-400">Nenhum caso registrado ainda.</p>
               )}
             </div>
             
             <div>
-              <h4 className="text-lg font-medium text-gray-900 mb-4">Distribuição por Tipo de Animal</h4>
+              <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Distribuição por Tipo de Animal</h4>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                  <span className="font-medium text-gray-900">Cães</span>
-                  <span className="text-sm text-gray-500">
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                  <span className="font-medium text-gray-900 dark:text-white">Cães</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     {leishmaniasisCases.filter(case_ => case_.tipoAnimal === 'cao').length} casos
                   </span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                  <span className="font-medium text-gray-900">Gatos</span>
-                  <span className="text-sm text-gray-500">
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                  <span className="font-medium text-gray-900 dark:text-white">Gatos</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     {leishmaniasisCases.filter(case_ => case_.tipoAnimal === 'gato').length} casos
                   </span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                  <span className="font-medium text-gray-900">Outros</span>
-                  <span className="text-sm text-gray-500">
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                  <span className="font-medium text-gray-900 dark:text-white">Outros</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     {leishmaniasisCases.filter(case_ => case_.tipoAnimal === 'outro').length} casos
                   </span>
                 </div>
               </div>
               
-              <h4 className="text-lg font-medium text-gray-900 mb-4 mt-6">Áreas de Atuação</h4>
+              <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-4 mt-6">Áreas de Atuação</h4>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                  <span className="font-medium text-gray-900">Área 1</span>
-                  <span className="text-sm text-gray-500">
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                  <span className="font-medium text-gray-900 dark:text-white">Área 1</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     {leishmaniasisCases.filter(case_ => case_.area === '1').length} casos
                   </span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                  <span className="font-medium text-gray-900">Área 2</span>
-                  <span className="text-sm text-gray-500">
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                  <span className="font-medium text-gray-900 dark:text-white">Área 2</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     {leishmaniasisCases.filter(case_ => case_.area === '2').length} casos
                   </span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                  <span className="font-medium text-gray-900">Outras Áreas</span>
-                  <span className="text-sm text-gray-500">
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                  <span className="font-medium text-gray-900 dark:text-white">Outras Áreas</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     {leishmaniasisCases.filter(case_ => !['1', '2'].includes(case_.area)).length} casos
                   </span>
                 </div>
