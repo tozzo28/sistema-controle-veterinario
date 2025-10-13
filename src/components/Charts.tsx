@@ -44,6 +44,20 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
       color: COLORS[index % COLORS.length]
     }));
 
+    // Distribuição por tipo de animal
+    const tipoData = leishmaniasisCases.reduce((acc: any, case_) => {
+      const tipo = case_.tipoAnimal || 'Não informado';
+      const tipoFormatado = tipo === 'cao' ? 'Cão' : tipo === 'gato' ? 'Gato' : 'Outro';
+      acc[tipoFormatado] = (acc[tipoFormatado] || 0) + 1;
+      return acc;
+    }, {});
+
+    const tipoChartData = Object.entries(tipoData).map(([name, value], index) => ({
+      name,
+      value,
+      color: COLORS[index % COLORS.length]
+    }));
+
     // Distribuição por idade (agrupar em faixas)
     const idadeData = leishmaniasisCases.reduce((acc: any, case_) => {
       const idade = case_.idade || 'Não informado';
@@ -68,12 +82,12 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
       color: COLORS[index % COLORS.length]
     }));
 
-    return { racaChartData, sexoChartData, idadeChartData };
+    return { racaChartData, sexoChartData, tipoChartData, idadeChartData };
   };
 
-  const { racaChartData, sexoChartData, idadeChartData } = processData();
+  const { racaChartData, sexoChartData, tipoChartData, idadeChartData } = processData();
 
-  console.log('Processed data:', { racaChartData, sexoChartData, idadeChartData });
+  console.log('Processed data:', { racaChartData, sexoChartData, tipoChartData, idadeChartData });
 
   // Se não há dados, mostrar mensagem
   if (leishmaniasisCases.length === 0) {
@@ -92,7 +106,7 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+        <div className="bg-white dark:bg-gray-800 p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-md text-sm">
           <p className="text-gray-900 dark:text-white font-medium">{`${label}: ${payload[0].value}`}</p>
         </div>
       );
@@ -132,6 +146,34 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
                 dataKey="value"
               >
                 {racaChartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Gráfico de Distribuição por Tipo de Animal */}
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Distribuição por Tipo de Animal
+        </h3>
+        <div className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={tipoChartData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {tipoChartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>

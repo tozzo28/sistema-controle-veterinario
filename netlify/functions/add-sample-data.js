@@ -62,7 +62,16 @@ exports.handler = async (event, context) => {
       ('Misty', 'gato', '3 anos', 'Tonkinese', 'Fêmea', 'Curta', 'Natural Mink', 'Amanda Silva', 'tratamento', 'Norte', 'B', '357.159.486-00', '(11) 60606-6060', 'Av. das Bromélias, 357'),
       ('King', 'cão', '7 anos', 'Great Dane', 'Macho', 'Curta', 'Azul', 'Paulo Rocha', 'notificado', 'Sul', 'C', '159.357.486-00', '(11) 70707-7070', 'Rua dos Lírios do Vale, 159'),
       ('Cleo', 'gato', '2 anos', 'Devon Rex', 'Fêmea', 'Curta', 'Preto', 'Larissa Castro', 'positivo', 'Leste', 'D', '486.357.159-00', '(11) 80808-8080', 'Av. das Estrelícias, 486'),
-      ('Bear', 'cão', '1 ano', 'Bernese Mountain Dog', 'Macho', 'Longa', 'Tricolor', 'Marcelo Dias', 'tratamento', 'Oeste', 'E', '357.486.159-00', '(11) 90909-9090', 'Rua dos Copos de Leite, 357')
+      ('Bear', 'cão', '1 ano', 'Bernese Mountain Dog', 'Macho', 'Longa', 'Tricolor', 'Marcelo Dias', 'tratamento', 'Oeste', 'E', '357.486.159-00', '(11) 90909-9090', 'Rua dos Copos de Leite, 357'),
+      ('Buddy', 'cão', '3 anos', 'Golden Retriever', 'Macho', 'Longa', 'Dourado', 'Carlos Silva', 'positivo', 'Centro', 'A', '111.222.333-00', '(11) 11111-1111', 'Rua dos Cães, 111'),
+      ('Fluffy', 'gato', '2 anos', 'Persa', 'Fêmea', 'Longa', 'Branco', 'Ana Costa', 'notificado', 'Norte', 'B', '222.333.444-00', '(11) 22222-2222', 'Av. dos Gatos, 222'),
+      ('Rex', 'cão', '4 anos', 'Pastor Alemão', 'Macho', 'Curta', 'Preto', 'João Santos', 'tratamento', 'Sul', 'C', '333.444.555-00', '(11) 33333-3333', 'Rua dos Pastores, 333'),
+      ('Whiskers', 'gato', '1 ano', 'Siamês', 'Macho', 'Curta', 'Seal Point', 'Maria Lima', 'positivo', 'Leste', 'D', '444.555.666-00', '(11) 44444-4444', 'Av. dos Siameses, 444'),
+      ('Max', 'cão', '5 anos', 'Labrador', 'Macho', 'Curta', 'Dourado', 'Pedro Oliveira', 'notificado', 'Oeste', 'E', '555.666.777-00', '(11) 55555-5555', 'Rua dos Labradores, 555'),
+      ('Luna', 'gato', '3 anos', 'Maine Coon', 'Fêmea', 'Longa', 'Tigrado', 'Carla Silva', 'tratamento', 'Centro', 'A', '666.777.888-00', '(11) 66666-6666', 'Av. dos Maine Coons, 666'),
+      ('Thor', 'cão', '2 anos', 'Rottweiler', 'Macho', 'Curta', 'Preto', 'Roberto Costa', 'positivo', 'Norte', 'B', '777.888.999-00', '(11) 77777-7777', 'Rua dos Rottweilers, 777'),
+      ('Bella', 'gato', '4 anos', 'Ragdoll', 'Fêmea', 'Longa', 'Azul', 'Fernanda Santos', 'notificado', 'Sul', 'C', '888.999.000-00', '(11) 88888-8888', 'Av. dos Ragdolls, 888'),
+      ('Zeus', 'cão', '6 anos', 'Doberman', 'Macho', 'Curta', 'Preto', 'Antonio Lima', 'tratamento', 'Leste', 'D', '999.000.111-00', '(11) 99999-9999', 'Rua dos Dobermans, 999')
     `);
     
     // Inserir dados de exemplo para vacinas antirrábicas
