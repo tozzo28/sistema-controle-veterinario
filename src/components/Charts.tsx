@@ -1,5 +1,5 @@
 import React from 'react';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface ChartData {
   name: string;
@@ -124,10 +124,17 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
           background: transparent !important;
         }
         .recharts-bar-rectangle:hover {
+          fill: #3B82F6 !important;
           fill-opacity: 1 !important;
         }
         .recharts-bar-rectangle {
           transition: none !important;
+        }
+        .recharts-tooltip-wrapper {
+          background: transparent !important;
+        }
+        .recharts-tooltip-content {
+          background: transparent !important;
         }
       `}</style>
       
@@ -206,18 +213,15 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={sexoChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis 
                 dataKey="name" 
                 stroke="#6B7280"
                 fontSize={12}
-                axisLine={false}
-                tickLine={false}
               />
               <YAxis 
                 stroke="#6B7280"
                 fontSize={12}
-                axisLine={false}
-                tickLine={false}
               />
               <Tooltip content={<CustomTooltip />} />
               <Bar 
@@ -240,6 +244,7 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={idadeChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis 
                 dataKey="name" 
                 stroke="#6B7280"
@@ -247,14 +252,10 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
                 angle={-45}
                 textAnchor="end"
                 height={80}
-                axisLine={false}
-                tickLine={false}
               />
               <YAxis 
                 stroke="#6B7280"
                 fontSize={12}
-                axisLine={false}
-                tickLine={false}
               />
               <Tooltip content={<CustomTooltip />} />
               <Bar 
