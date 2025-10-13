@@ -102,6 +102,17 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
 
   return (
     <div className="space-y-8">
+      {/* Debug Info */}
+      <div className="bg-yellow-100 dark:bg-yellow-900 p-4 rounded-lg">
+        <h4 className="font-semibold text-yellow-800 dark:text-yellow-200">Debug Info:</h4>
+        <p className="text-yellow-700 dark:text-yellow-300">
+          Total de casos: {leishmaniasisCases.length}
+        </p>
+        <p className="text-yellow-700 dark:text-yellow-300">
+          Dados de raça: {JSON.stringify(racaChartData.slice(0, 3))}
+        </p>
+      </div>
+
       {/* Gráfico de Distribuição por Raça */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
