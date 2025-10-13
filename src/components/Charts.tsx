@@ -14,6 +14,8 @@ interface ChartsProps {
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#84CC16', '#F97316'];
 
 const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
+  console.log('Charts component - leishmaniasisCases:', leishmaniasisCases);
+  
   // Processar dados para gráficos
   const processData = () => {
     // Distribuição por raça
@@ -70,6 +72,22 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
   };
 
   const { racaChartData, sexoChartData, idadeChartData } = processData();
+
+  console.log('Processed data:', { racaChartData, sexoChartData, idadeChartData });
+
+  // Se não há dados, mostrar mensagem
+  if (leishmaniasisCases.length === 0) {
+    return (
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Análise de Distribuição
+        </h3>
+        <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+          Nenhum dado disponível para análise. Adicione alguns casos de leishmaniose para ver os gráficos.
+        </p>
+      </div>
+    );
+  }
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
