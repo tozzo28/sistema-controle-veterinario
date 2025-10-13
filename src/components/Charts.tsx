@@ -116,6 +116,21 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
 
   return (
     <div className="space-y-8">
+      <style jsx>{`
+        .recharts-wrapper {
+          background: transparent !important;
+        }
+        .recharts-surface {
+          background: transparent !important;
+        }
+        .recharts-bar-rectangle:hover {
+          fill-opacity: 1 !important;
+        }
+        .recharts-bar-rectangle {
+          transition: none !important;
+        }
+      `}</style>
+      
       {/* Debug Info */}
       <div className="bg-yellow-100 dark:bg-yellow-900 p-4 rounded-lg">
         <h4 className="font-semibold text-yellow-800 dark:text-yellow-200">Debug Info:</h4>
@@ -190,18 +205,28 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
         </h3>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={sexoChartData}>
+            <BarChart data={sexoChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <XAxis 
                 dataKey="name" 
                 stroke="#6B7280"
                 fontSize={12}
+                axisLine={false}
+                tickLine={false}
               />
               <YAxis 
                 stroke="#6B7280"
                 fontSize={12}
+                axisLine={false}
+                tickLine={false}
               />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="value" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+              <Bar 
+                dataKey="value" 
+                fill="#3B82F6" 
+                radius={[4, 4, 0, 0]}
+                stroke="none"
+                strokeWidth={0}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -214,7 +239,7 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
         </h3>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={idadeChartData}>
+            <BarChart data={idadeChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <XAxis 
                 dataKey="name" 
                 stroke="#6B7280"
@@ -222,13 +247,23 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
                 angle={-45}
                 textAnchor="end"
                 height={80}
+                axisLine={false}
+                tickLine={false}
               />
               <YAxis 
                 stroke="#6B7280"
                 fontSize={12}
+                axisLine={false}
+                tickLine={false}
               />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="value" fill="#10B981" radius={[4, 4, 0, 0]} />
+              <Bar 
+                dataKey="value" 
+                fill="#10B981" 
+                radius={[4, 4, 0, 0]}
+                stroke="none"
+                strokeWidth={0}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
