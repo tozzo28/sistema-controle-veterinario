@@ -34,15 +34,21 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
     // Distribuição por sexo
     const sexoData = leishmaniasisCases.reduce((acc: any, case_) => {
       const sexo = case_.sexo || 'Não informado';
-      acc[sexo] = (acc[sexo] || 0) + 1;
+      // Normalizar para evitar duplicatas
+      const sexoNormalizado = sexo.toLowerCase() === 'macho' ? 'Macho' : 
+                             sexo.toLowerCase() === 'fêmea' ? 'Fêmea' : 
+                             sexo.toLowerCase() === 'femea' ? 'Fêmea' : sexo;
+      acc[sexoNormalizado] = (acc[sexoNormalizado] || 0) + 1;
       return acc;
     }, {});
 
-    const sexoChartData = Object.entries(sexoData).map(([name, value], index) => ({
-      name,
-      value,
-      color: COLORS[index % COLORS.length]
-    }));
+    const sexoChartData = Object.entries(sexoData)
+      .filter(([name, value]) => value > 0) // Filtrar valores zerados
+      .map(([name, value], index) => ({
+        name,
+        value,
+        color: COLORS[index % COLORS.length]
+      }));
 
     // Distribuição por tipo de animal
     const tipoData = leishmaniasisCases.reduce((acc: any, case_) => {
@@ -135,6 +141,19 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
         }
         .recharts-tooltip-content {
           background: transparent !important;
+        }
+        .recharts-bar {
+          fill: #3B82F6 !important;
+        }
+        .recharts-bar:hover {
+          fill: #3B82F6 !important;
+        }
+        .recharts-cartesian-axis-tick {
+          fill: #6B7280 !important;
+        }
+        .recharts-cartesian-grid-horizontal line,
+        .recharts-cartesian-grid-vertical line {
+          stroke: #374151 !important;
         }
       `}</style>
       
