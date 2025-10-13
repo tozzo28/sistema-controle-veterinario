@@ -1,5 +1,5 @@
 import React from 'react';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface ChartData {
   name: string;
@@ -191,7 +191,6 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={sexoChartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis 
                 dataKey="name" 
                 stroke="#6B7280"
@@ -216,7 +215,6 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={idadeChartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis 
                 dataKey="name" 
                 stroke="#6B7280"
