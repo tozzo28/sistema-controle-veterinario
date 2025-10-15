@@ -241,17 +241,34 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
                 return sexosArray.map(([sexo, count], index) => {
                   const percentage = total > 0 ? ((count as number) / total * 100).toFixed(1) : '0';
                   const colors = ['bg-green-500', 'bg-emerald-500', 'bg-teal-500'];
-                  const icons = {
-                    'macho': '♂',
-                    'femea': '♀',
-                    'Não informado': '?'
+                  
+                  const getSexIcon = (sexo: string) => {
+                    if (sexo === 'macho') {
+                      return (
+                        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">♂</span>
+                        </div>
+                      );
+                    } else if (sexo === 'femea') {
+                      return (
+                        <div className="w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">♀</span>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div className="w-6 h-6 bg-gray-500 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">?</span>
+                        </div>
+                      );
+                    }
                   };
                   
                   return (
                     <div key={sexo} className="relative">
                       <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-lg">{icons[sexo as keyof typeof icons] || '?'}</span>
+                        <div className="flex items-center space-x-3">
+                          {getSexIcon(sexo)}
                           <span className="font-medium text-gray-900 dark:text-white text-sm">
                             {sexo === 'macho' ? 'Macho' : sexo === 'femea' ? 'Fêmea' : sexo}
                           </span>
