@@ -149,26 +149,39 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
                 </div>
               </div>
               
-              <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-4 mt-6">Áreas de Atuação</h4>
+              <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-4 mt-6">Distribuição por Área</h4>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                  <span className="font-medium text-gray-900 dark:text-white">Área 1</span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {leishmaniasisCases.filter(case_ => case_.area === '1').length} casos
-                  </span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                  <span className="font-medium text-gray-900 dark:text-white">Área 2</span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {leishmaniasisCases.filter(case_ => case_.area === '2').length} casos
-                  </span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                  <span className="font-medium text-gray-900 dark:text-white">Outras Áreas</span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {leishmaniasisCases.filter(case_ => !['1', '2'].includes(case_.area)).length} casos
-                  </span>
-                </div>
+                {(() => {
+                  // Calcular áreas dinamicamente
+                  const areas = leishmaniasisCases.reduce((acc: any, case_) => {
+                    const area = case_.area || 'Não informado';
+                    acc[area] = (acc[area] || 0) + 1;
+                    return acc;
+                  }, {});
+
+                  const areasArray = Object.entries(areas)
+                    .sort(([,a], [,b]) => (b as number) - (a as number))
+                    .slice(0, 5); // Mostrar apenas as 5 áreas com mais casos
+
+                  if (areasArray.length === 0) {
+                    return (
+                      <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+                        Nenhuma área registrada ainda.
+                      </p>
+                    );
+                  }
+
+                  return areasArray.map(([area, count]) => (
+                    <div key={area} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        {area === 'Não informado' ? 'Não informado' : `Área ${area}`}
+                      </span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {count} casos
+                      </span>
+                    </div>
+                  ));
+                })()}
               </div>
             </div>
           </div>

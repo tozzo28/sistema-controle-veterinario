@@ -219,19 +219,15 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Local da Vacinação</label>
-                <select
+                <input
+                  type="text"
                   name="localVacinacao"
                   value={formData.localVacinacao}
                   onChange={handleChange}
+                  placeholder="Ex: Centro Veterinário Municipal, Clínica Pet Care..."
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   required
-                >
-                  <option value="">Selecione</option>
-                  <option value="centro_municipal">Centro Veterinário Municipal</option>
-                  <option value="clinica_pet_care">Clínica Pet Care</option>
-                  <option value="hospital_sao_francisco">Hospital Veterinário São Francisco</option>
-                  <option value="campanha_publica">Campanha Pública</option>
-                </select>
+                />
               </div>
               
               <div>
@@ -303,17 +299,15 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Área</label>
-                <select
+                <input
+                  type="text"
                   name="area"
                   value={formData.area}
                   onChange={handleChange}
+                  placeholder="Ex: Centro, Norte, Sul, Leste, Oeste..."
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   required
-                >
-                  <option value="">Selecione</option>
-                  <option value="1">Área 1</option>
-                  <option value="2">Área 2</option>
-                </select>
+                />
               </div>
             </div>
           </section>

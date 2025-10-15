@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Search, Filter, MapPin, Building } from 'lucide-react';
+import { Plus, Search, Filter } from 'lucide-react';
 import RabiesVaccineForm from './RabiesVaccineForm';
 import RabiesVaccineList from './RabiesVaccineList';
-import { fetchRabies } from '../api';
 
 const RabiesVaccineControl: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
@@ -10,10 +9,10 @@ const RabiesVaccineControl: React.FC = () => {
   const [filterType, setFilterType] = useState('all');
   const [onlyLost, setOnlyLost] = useState(false);
 
-  const [stats, setStats] = useState({ total: 0, caes: 0, gatos: 0, dosesPerdidas: 0, locais: { centro: 0, clinica: 0, hospital: 0 } });
+  const [stats, setStats] = useState({ total: 0, caes: 0, gatos: 0, dosesPerdidas: 0 });
 
   useEffect(() => {
-    fetch('/.netlify/functions/api-rabies-stats-simple').then(r => r.json()).then(setStats).catch(() => setStats({ total: 0, caes: 0, gatos: 0, dosesPerdidas: 0, locais: { centro: 0, clinica: 0, hospital: 0 } }));
+    fetch('/.netlify/functions/api-rabies-stats-simple').then(r => r.json()).then(setStats).catch(() => setStats({ total: 0, caes: 0, gatos: 0, dosesPerdidas: 0 }));
   }, []);
 
   return (
@@ -43,38 +42,6 @@ const RabiesVaccineControl: React.FC = () => {
         <RabiesVaccineForm onClose={() => setShowForm(false)} />
       )}
 
-      {/* Locais de Vacinação */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <MapPin className="h-5 w-5 mr-2" />
-          Locais de Vacinação
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <div className="flex items-center mb-2">
-              <Building className="h-4 w-4 mr-2 text-gray-500" />
-              <span className="font-medium">Centro Veterinário Municipal</span>
-            </div>
-            <p className="text-sm text-gray-600">Vacinas aplicadas: {stats.locais.centro}</p>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <div className="flex items-center mb-2">
-              <Building className="h-4 w-4 mr-2 text-gray-500" />
-              <span className="font-medium">Clínica Pet Care</span>
-            </div>
-            <p className="text-sm text-gray-600">Vacinas aplicadas: {stats.locais.clinica}</p>
-          </div>
-          
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <div className="flex items-center mb-2">
-              <Building className="h-4 w-4 mr-2 text-gray-500" />
-              <span className="font-medium">Hospital Veterinário São Francisco</span>
-            </div>
-            <p className="text-sm text-gray-600">Vacinas aplicadas: {stats.locais.hospital}</p>
-          </div>
-        </div>
-      </div>
 
       {/* Lista de Vacinações */}
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
