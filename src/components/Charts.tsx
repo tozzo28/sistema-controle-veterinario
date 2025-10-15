@@ -1,5 +1,5 @@
 import React from 'react';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Users, Heart, MapPin, Calendar } from 'lucide-react';
 
 interface LeishmaniasisCase {
   id: number;
@@ -22,7 +22,7 @@ interface ChartsProps {
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'];
 
 const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
-  // Processar dados para os gráficos
+  // Processar dados para as estatísticas
   const processData = () => {
     // Distribuição por tipo de animal
     const tipoData = leishmaniasisCases.reduce((acc: any, case_) => {
@@ -32,12 +32,6 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
       return acc;
     }, {});
 
-    const tipoChartData = Object.entries(tipoData).map(([name, value], index) => ({
-      name,
-      value,
-      color: COLORS[index % COLORS.length]
-    }));
-
     // Distribuição por raça
     const racaData = leishmaniasisCases.reduce((acc: any, case_) => {
       const raca = case_.raca || 'Não informado';
@@ -45,14 +39,9 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
       return acc;
     }, {});
 
-    const racaChartData = Object.entries(racaData)
+    const topRacas = Object.entries(racaData)
       .sort(([,a], [,b]) => (b as number) - (a as number))
-      .slice(0, 6) // Top 6 raças
-      .map(([name, value], index) => ({
-        name,
-        value,
-        color: COLORS[index % COLORS.length]
-      }));
+      .slice(0, 5);
 
     // Distribuição por sexo
     const sexoData = leishmaniasisCases.reduce((acc: any, case_) => {
@@ -64,34 +53,21 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
       return acc;
     }, {});
 
-    const sexoChartData = Object.entries(sexoData)
-      .filter(([name, value]) => value > 0)
-      .map(([name, value], index) => ({
-        name,
-        value,
-        color: COLORS[index % COLORS.length]
-      }));
-
-    // Distribuição por idade
-    const idadeData = leishmaniasisCases.reduce((acc: any, case_) => {
-      const idade = case_.idade || 'Não informado';
-      acc[idade] = (acc[idade] || 0) + 1;
+    // Distribuição por área
+    const areaData = leishmaniasisCases.reduce((acc: any, case_) => {
+      const area = case_.area || 'Não informado';
+      acc[area] = (acc[area] || 0) + 1;
       return acc;
     }, {});
 
-    const idadeChartData = Object.entries(idadeData)
+    const topAreas = Object.entries(areaData)
       .sort(([,a], [,b]) => (b as number) - (a as number))
-      .slice(0, 8) // Top 8 faixas etárias
-      .map(([name, value], index) => ({
-        name,
-        value,
-        color: COLORS[index % COLORS.length]
-      }));
+      .slice(0, 5);
 
-    return { tipoChartData, racaChartData, sexoChartData, idadeChartData };
+    return { tipoData, topRacas, sexoData, topAreas };
   };
 
-  const { tipoChartData, racaChartData, sexoChartData, idadeChartData } = processData();
+  const { tipoData, topRacas, sexoData, topAreas } = processData();
 
   if (leishmaniasisCases.length === 0) {
     return (
@@ -100,140 +76,119 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
           Análise de Distribuição
         </h3>
         <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-          Nenhum dado disponível para análise. Adicione alguns casos de leishmaniose para ver os gráficos.
+          Nenhum dado disponível para análise. Adicione alguns casos de leishmaniose para ver as estatísticas.
         </p>
       </div>
     );
   }
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg text-sm">
-          <p className="text-gray-900 dark:text-white font-medium">{`${label}: ${payload[0].value}`}</p>
-        </div>
-      );
-    }
-    return null;
-  };
-
   return (
-    <div className="space-y-8">
-      {/* Gráfico de Distribuição por Tipo de Animal */}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Card de Distribuição por Tipo de Animal */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Distribuição por Tipo de Animal
-        </h3>
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={tipoChartData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {tipoChartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip content={<CustomTooltip />} />
-            </PieChart>
-          </ResponsiveContainer>
+        <div className="flex items-center mb-4">
+          <Users className="h-6 w-6 text-blue-600 mr-3" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Por Tipo de Animal
+          </h3>
+        </div>
+        <div className="space-y-3">
+          {Object.entries(tipoData).map(([tipo, count], index) => (
+            <div key={tipo} className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div 
+                  className="w-3 h-3 rounded-full mr-2" 
+                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                ></div>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{tipo}</span>
+              </div>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                {count as number}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Gráfico de Distribuição por Raça */}
+      {/* Card de Top Raças */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Distribuição por Raça
-        </h3>
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={racaChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <XAxis 
-                dataKey="name" 
-                stroke="#6B7280"
-                fontSize={12}
-                angle={-45}
-                textAnchor="end"
-                height={80}
-              />
-              <YAxis 
-                stroke="#6B7280"
-                fontSize={12}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar 
-                dataKey="value" 
-                fill="#3B82F6" 
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="flex items-center mb-4">
+          <Heart className="h-6 w-6 text-red-600 mr-3" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Top Raças
+          </h3>
+        </div>
+        <div className="space-y-3">
+          {topRacas.map(([raca, count], index) => (
+            <div key={raca} className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div 
+                  className="w-3 h-3 rounded-full mr-2" 
+                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                ></div>
+                <span className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                  {raca}
+                </span>
+              </div>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                {count as number}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Gráfico de Distribuição por Sexo */}
+      {/* Card de Distribuição por Sexo */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Distribuição por Sexo
-        </h3>
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={sexoChartData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {sexoChartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip content={<CustomTooltip />} />
-            </PieChart>
-          </ResponsiveContainer>
+        <div className="flex items-center mb-4">
+          <Users className="h-6 w-6 text-green-600 mr-3" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Por Sexo
+          </h3>
+        </div>
+        <div className="space-y-3">
+          {Object.entries(sexoData).map(([sexo, count], index) => (
+            <div key={sexo} className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div 
+                  className="w-3 h-3 rounded-full mr-2" 
+                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                ></div>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{sexo}</span>
+              </div>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                {count as number}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Gráfico de Distribuição por Idade */}
+      {/* Card de Top Áreas */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Distribuição por Faixa Etária
-        </h3>
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={idadeChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <XAxis 
-                dataKey="name" 
-                stroke="#6B7280"
-                fontSize={12}
-                angle={-45}
-                textAnchor="end"
-                height={80}
-              />
-              <YAxis 
-                stroke="#6B7280"
-                fontSize={12}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar 
-                dataKey="value" 
-                fill="#10B981" 
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="flex items-center mb-4">
+          <MapPin className="h-6 w-6 text-purple-600 mr-3" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Top Áreas
+          </h3>
+        </div>
+        <div className="space-y-3">
+          {topAreas.map(([area, count], index) => (
+            <div key={area} className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div 
+                  className="w-3 h-3 rounded-full mr-2" 
+                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                ></div>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {area === 'Não informado' ? 'Não informado' : `Área ${area}`}
+                </span>
+              </div>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                {count as number}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
