@@ -155,6 +155,28 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
         .recharts-cartesian-grid-vertical line {
           stroke: #374151 !important;
         }
+        /* Eliminar elementos ocultos que causam fundo cinza */
+        .recharts-bar-rectangle[style*="visibility: hidden"] {
+          display: none !important;
+        }
+        .recharts-bar-rectangle[style*="pointer-events: none"] {
+          display: none !important;
+        }
+        .recharts-bar-rectangle[style*="position: absolute"] {
+          display: none !important;
+        }
+        /* Forçar transparência em todos os elementos de fundo */
+        .recharts-bar-rectangle {
+          background: transparent !important;
+          background-color: transparent !important;
+        }
+        /* Eliminar qualquer elemento com fundo cinza */
+        *[style*="background"] {
+          background: transparent !important;
+        }
+        *[style*="background-color"] {
+          background-color: transparent !important;
+        }
       `}</style>
       
       {/* Debug Info */}
@@ -230,28 +252,27 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
           Distribuição por Sexo
         </h3>
         <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={sexoChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis 
-                dataKey="name" 
-                stroke="#6B7280"
-                fontSize={12}
-              />
-              <YAxis 
-                stroke="#6B7280"
-                fontSize={12}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar 
-                dataKey="value" 
-                fill="#3B82F6" 
-                radius={[4, 4, 0, 0]}
-                stroke="none"
-                strokeWidth={0}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+                 <ResponsiveContainer width="100%" height="100%">
+                   <BarChart data={sexoChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                     <XAxis 
+                       dataKey="name" 
+                       stroke="#6B7280"
+                       fontSize={12}
+                     />
+                     <YAxis 
+                       stroke="#6B7280"
+                       fontSize={12}
+                     />
+                     <Tooltip content={<CustomTooltip />} />
+                     <Bar 
+                       dataKey="value" 
+                       fill="#3B82F6" 
+                       radius={[4, 4, 0, 0]}
+                       stroke="none"
+                       strokeWidth={0}
+                     />
+                   </BarChart>
+                 </ResponsiveContainer>
         </div>
       </div>
 
@@ -261,31 +282,30 @@ const Charts: React.FC<ChartsProps> = ({ leishmaniasisCases }) => {
           Distribuição por Faixa Etária
         </h3>
         <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={idadeChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis 
-                dataKey="name" 
-                stroke="#6B7280"
-                fontSize={12}
-                angle={-45}
-                textAnchor="end"
-                height={80}
-              />
-              <YAxis 
-                stroke="#6B7280"
-                fontSize={12}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar 
-                dataKey="value" 
-                fill="#10B981" 
-                radius={[4, 4, 0, 0]}
-                stroke="none"
-                strokeWidth={0}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+                 <ResponsiveContainer width="100%" height="100%">
+                   <BarChart data={idadeChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                     <XAxis 
+                       dataKey="name" 
+                       stroke="#6B7280"
+                       fontSize={12}
+                       angle={-45}
+                       textAnchor="end"
+                       height={80}
+                     />
+                     <YAxis 
+                       stroke="#6B7280"
+                       fontSize={12}
+                     />
+                     <Tooltip content={<CustomTooltip />} />
+                     <Bar 
+                       dataKey="value" 
+                       fill="#10B981" 
+                       radius={[4, 4, 0, 0]}
+                       stroke="none"
+                       strokeWidth={0}
+                     />
+                   </BarChart>
+                 </ResponsiveContainer>
         </div>
       </div>
     </div>
