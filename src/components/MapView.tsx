@@ -31,8 +31,8 @@ interface MapViewProps {
   leishmaniasisCases: LeishmaniasisCase[];
 }
 
-// Coordenadas aproximadas de Paraguaçu, MG
-const PARAGUACU_COORDS = [-21.5497, -45.7378];
+// Coordenadas aproximadas de Paraguaçu, SP
+const PARAGUACU_COORDS = [-22.4114, -50.5739];
 
 // Função para geocodificar endereços (simulada para Paraguaçu)
 const geocodeAddress = (endereco: string, area: string, quadra: string) => {
@@ -107,7 +107,7 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
           <MapPin className="h-5 w-5 mr-2 text-blue-600" />
-          Mapa de Casos - Paraguaçu/MG
+          Mapa de Casos - Paraguaçu/SP
         </h3>
         <p className="text-gray-500 dark:text-gray-400 text-center py-8">
           Nenhum caso registrado para exibir no mapa.
@@ -165,7 +165,7 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
           <MapPin className="h-5 w-5 mr-2 text-blue-600" />
-          Mapa de Casos - Paraguaçu/MG
+          Mapa de Casos - Paraguaçu/SP
         </h3>
         
         <div className="h-96 w-full rounded-lg overflow-hidden">
