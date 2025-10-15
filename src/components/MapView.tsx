@@ -117,61 +117,61 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Estatísticas do Mapa */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+        <div className="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center">
-            <MapPin className="h-5 w-5 text-blue-600 mr-2" />
+            <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 mr-2" />
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">{stats.total}</p>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Total</p>
+              <p className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{stats.total}</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center">
-            <AlertTriangle className="h-5 w-5 text-red-600 mr-2" />
+            <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 mr-2" />
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Positivos</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">{stats.positivos}</p>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Positivos</p>
+              <p className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{stats.positivos}</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center">
-            <Activity className="h-5 w-5 text-yellow-600 mr-2" />
+            <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600 mr-2" />
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Notificados</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">{stats.notificados}</p>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Notificados</p>
+              <p className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{stats.notificados}</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center">
-            <Shield className="h-5 w-5 text-green-600 mr-2" />
+            <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 mr-2" />
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Em Tratamento</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">{stats.tratamento}</p>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Em Tratamento</p>
+              <p className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{stats.tratamento}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Mapa */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-          <MapPin className="h-5 w-5 mr-2 text-blue-600" />
+      <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 flex items-center">
+          <MapPin className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-blue-600" />
           Mapa de Casos - Paraguaçu/SP
         </h3>
         
-        <div className="h-96 w-full rounded-lg overflow-hidden">
+        <div className="h-64 sm:h-80 md:h-96 w-full rounded-lg overflow-hidden">
           <MapContainer
             center={mapCenter}
-            zoom={13}
+            zoom={12}
             style={{ height: '100%', width: '100%' }}
             className="z-0"
           >
@@ -215,9 +215,9 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
                   icon={customIcon}
                 >
                   <Popup>
-                    <div className="p-2">
-                      <h4 className="font-semibold text-gray-900 mb-2">{case_.nomeAnimal}</h4>
-                      <div className="space-y-1 text-sm">
+                    <div className="p-2 max-w-xs">
+                      <h4 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">{case_.nomeAnimal}</h4>
+                      <div className="space-y-1 text-xs sm:text-sm">
                         <p><strong>Tutor:</strong> {case_.nomeTutor}</p>
                         <p><strong>Tipo:</strong> {case_.tipoAnimal === 'cao' ? 'Cão' : 'Gato'}</p>
                         <p><strong>Raça:</strong> {case_.raca || 'Não informado'}</p>
@@ -246,17 +246,17 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
         </div>
         
         {/* Legenda */}
-        <div className="mt-4 flex flex-wrap gap-4 text-sm">
+        <div className="mt-3 sm:mt-4 flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm">
           <div className="flex items-center">
-            <div className="w-4 h-4 bg-red-500 rounded-full mr-2"></div>
+            <div className="w-3 h-3 sm:w-4 sm:h-4 bg-red-500 rounded-full mr-1 sm:mr-2"></div>
             <span className="text-gray-600 dark:text-gray-400">Positivo</span>
           </div>
           <div className="flex items-center">
-            <div className="w-4 h-4 bg-orange-500 rounded-full mr-2"></div>
+            <div className="w-3 h-3 sm:w-4 sm:h-4 bg-orange-500 rounded-full mr-1 sm:mr-2"></div>
             <span className="text-gray-600 dark:text-gray-400">Notificado</span>
           </div>
           <div className="flex items-center">
-            <div className="w-4 h-4 bg-blue-500 rounded-full mr-2"></div>
+            <div className="w-3 h-3 sm:w-4 sm:h-4 bg-blue-500 rounded-full mr-1 sm:mr-2"></div>
             <span className="text-gray-600 dark:text-gray-400">Em Tratamento</span>
           </div>
         </div>

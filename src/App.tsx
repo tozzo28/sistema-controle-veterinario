@@ -80,7 +80,7 @@ function App() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navigation activeSection={activeSection} setActiveSection={setActiveSection} />
         <ThemeToggle />
-        <main className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-8">
           {renderActiveSection()}
         </main>
       </div>
