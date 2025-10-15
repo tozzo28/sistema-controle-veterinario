@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AlertTriangle, Syringe, Activity, Shield } from 'lucide-react';
 import StatCard from './StatCard';
 import Charts from './Charts';
+import MapView from './MapView';
 
 interface LeishmaniasisCase {
   id: number;
@@ -88,6 +89,12 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
             <StatCard key={index} {...stat} />
           ))}
         </div>
+      </section>
+
+      {/* Mapa de Georreferenciamento */}
+      <section>
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Mapa de Casos</h3>
+        <MapView leishmaniasisCases={leishmaniasisCases} />
       </section>
 
       {/* Gráficos de Distribuição */}
