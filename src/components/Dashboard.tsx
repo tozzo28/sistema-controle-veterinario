@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AlertTriangle, Syringe, Activity, Shield } from 'lucide-react';
 import StatCard from './StatCard';
-import Charts from './Charts';
 
 interface LeishmaniasisCase {
   id: number;
@@ -90,11 +89,6 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
         </div>
       </section>
 
-      {/* Gráficos de Distribuição */}
-      <section>
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Análise de Distribuição</h3>
-        <Charts leishmaniasisCases={leishmaniasisCases} />
-      </section>
 
       <section>
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Resumo das Atividades</h3>
