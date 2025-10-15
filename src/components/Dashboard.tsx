@@ -246,13 +246,13 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
                     if (sexo === 'macho') {
                       return (
                         <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">♂</span>
+                          <span className="text-white font-bold text-sm">M</span>
                         </div>
                       );
                     } else if (sexo === 'femea') {
                       return (
                         <div className="w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">♀</span>
+                          <span className="text-white font-bold text-sm">F</span>
                         </div>
                       );
                     } else {
