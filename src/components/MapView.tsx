@@ -4,13 +4,31 @@ import L from 'leaflet';
 import { MapPin, AlertTriangle, Activity, Shield } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
-// Fix para ícones do Leaflet
+// Suprimir warnings de APIs obsoletas do Leaflet
+const originalConsoleWarn = console.warn;
+console.warn = (...args) => {
+  const message = args[0];
+  if (typeof message === 'string' && (
+    message.includes('mozPressure') || 
+    message.includes('mozInputSource') ||
+    message.includes('MouseEvent.mozPressure') ||
+    message.includes('MouseEvent.mozInputSource')
+  )) {
+    return; // Suprimir esses warnings específicos
+  }
+  originalConsoleWarn.apply(console, args);
+};
+
+// Fix para ícones do Leaflet - usando URLs mais confiáveis
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
+
+// Configurações para evitar bloqueios de recursos
+L.Icon.Default.prototype.options.crossOrigin = 'anonymous';
 
 interface LeishmaniasisCase {
   id: number;
@@ -179,7 +197,9 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
             
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+              maxZoom={19}
+              subdomains={[]}
             />
             
             {mapCases.map((case_) => {
