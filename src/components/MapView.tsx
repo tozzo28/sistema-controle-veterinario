@@ -186,12 +186,17 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
           Mapa de Casos - Paraguaçu/SP
         </h3>
         
-        <div className="h-64 sm:h-80 md:h-96 w-full rounded-lg overflow-hidden">
+        <div className="h-80 sm:h-96 md:h-[500px] w-full rounded-lg overflow-hidden">
           <MapContainer
             center={mapCenter}
             zoom={12}
             style={{ height: '100%', width: '100%' }}
             className="z-0"
+            zoomControl={true}
+            touchZoom={true}
+            doubleClickZoom={true}
+            scrollWheelZoom={true}
+            dragging={true}
           >
             <MapCenter center={mapCenter} />
             
@@ -235,18 +240,18 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
                   icon={customIcon}
                 >
                   <Popup>
-                    <div className="p-2 max-w-xs">
+                    <div className="p-3 max-w-xs sm:max-w-sm">
                       <h4 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">{case_.nomeAnimal}</h4>
-                      <div className="space-y-1 text-xs sm:text-sm">
+                      <div className="space-y-2 text-xs sm:text-sm">
                         <p><strong>Tutor:</strong> {case_.nomeTutor}</p>
                         <p><strong>Tipo:</strong> {case_.tipoAnimal === 'cao' ? 'Cão' : 'Gato'}</p>
                         <p><strong>Raça:</strong> {case_.raca || 'Não informado'}</p>
                         <p><strong>Status:</strong> 
                           <span className={`ml-1 px-2 py-1 rounded text-xs ${
-                            case_.status === 'positivo' ? 'bg-red-100 text-red-800' :
-                            case_.status === 'notificado' ? 'bg-yellow-100 text-yellow-800' :
-                            case_.status === 'tratamento' ? 'bg-blue-100 text-blue-800' :
-                            'bg-gray-100 text-gray-800'
+                            case_.status === 'positivo' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                            case_.status === 'notificado' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                            case_.status === 'tratamento' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                           }`}>
                             {case_.status === 'positivo' ? 'Positivo' :
                              case_.status === 'notificado' ? 'Notificado' :

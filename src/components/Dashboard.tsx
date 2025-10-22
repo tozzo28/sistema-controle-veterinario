@@ -65,17 +65,17 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
   ];
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
         <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
           Último update: {new Date().toLocaleDateString('pt-BR')}
         </div>
       </div>
 
       <section>
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">Controle de Leishmaniose</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+        <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 lg:mb-6">Controle de Leishmaniose</h3>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-6">
           {leishmaniasisStats.map((stat, index) => (
             <StatCard key={index} {...stat} />
           ))}
@@ -83,8 +83,8 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
       </section>
 
       <section>
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">Vacina Antirrábica</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+        <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 lg:mb-6">Vacina Antirrábica</h3>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-6">
           {rabiesCards.map((stat, index) => (
             <StatCard key={index} {...stat} />
           ))}

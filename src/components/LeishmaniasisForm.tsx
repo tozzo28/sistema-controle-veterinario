@@ -54,11 +54,11 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[95vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">Cadastrar Novo Caso - Leishmaniose</h3>
+        <div className="flex items-center justify-between p-3 sm:p-4 lg:p-6 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 dark:text-white">Cadastrar Novo Caso - Leishmaniose</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 -m-2"
           >
             <X className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
@@ -78,7 +78,7 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                   name="nomeAnimal"
                   value={formData.nomeAnimal}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   required
                 />
               </div>
@@ -91,7 +91,7 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                   name="tipoAnimal"
                   value={formData.tipoAnimal}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   required
                 >
                   <option value="cao">Cão</option>
@@ -110,7 +110,7 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                   value={formData.idade}
                   onChange={handleChange}
                   placeholder="Ex: 3 anos"
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               
@@ -123,7 +123,7 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                   name="raca"
                   value={formData.raca}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               
@@ -135,7 +135,7 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                   name="sexo"
                   value={formData.sexo}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="">Selecione</option>
                   <option value="macho">Macho</option>
@@ -152,7 +152,7 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                   name="pelagem"
                   value={formData.pelagem}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               
@@ -165,7 +165,7 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                   name="corPelagem"
                   value={formData.corPelagem}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
@@ -184,7 +184,7 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                   name="nomeTutor"
                   value={formData.nomeTutor}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   required
                 />
               </div>
@@ -199,7 +199,7 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                   value={formData.cpf}
                   onChange={handleChange}
                   placeholder="000.000.000-00"
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               
@@ -213,7 +213,7 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                   value={formData.telefone}
                   onChange={handleChange}
                   placeholder="(00) 00000-0000"
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               
@@ -226,7 +226,7 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                   value={formData.endereco}
                   onChange={handleChange}
                   rows={2}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
@@ -246,7 +246,7 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                   value={formData.area}
                   onChange={handleChange}
                   placeholder="Ex: 1, 2, 3..."
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   required
                 />
               </div>
@@ -261,7 +261,7 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                   value={formData.quadra}
                   onChange={handleChange}
                   placeholder="Ex: A-15, B-23..."
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   required
                 />
               </div>
@@ -292,13 +292,13 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
             <button
               type="button"
               onClick={onClose}
-              className="w-full sm:w-auto px-4 sm:px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-base sm:text-sm font-medium"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-base sm:text-sm font-medium"
             >
               Salvar Caso
             </button>

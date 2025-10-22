@@ -78,7 +78,7 @@ const LeishmaniasisControl: React.FC<LeishmaniasisControlProps> = ({
               placeholder="Buscar por nome do animal ou tutor..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 sm:pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+              className="pl-9 sm:pl-10 pr-4 py-3 sm:py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base sm:text-sm"
             />
           </div>
           
@@ -87,7 +87,7 @@ const LeishmaniasisControl: React.FC<LeishmaniasisControlProps> = ({
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="pl-9 sm:pl-10 pr-8 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+              className="pl-9 sm:pl-10 pr-8 py-3 sm:py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base sm:text-sm"
             >
               <option value="all">Todos os Status</option>
               <option value="notificado">Notificados</option>
