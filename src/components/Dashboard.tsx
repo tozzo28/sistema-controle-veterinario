@@ -243,13 +243,16 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
                   const colors = ['bg-green-500', 'bg-emerald-500', 'bg-teal-500'];
                   
                   const getSexIcon = (sexo: string) => {
-                    if (sexo === 'macho') {
+                    const sexoLower = sexo?.toLowerCase()?.trim();
+                    console.log('Sexo recebido:', sexo, 'SexoLower:', sexoLower);
+                    
+                    if (sexoLower === 'macho' || sexoLower === 'm') {
                       return (
                         <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
                           <span className="text-white font-bold text-sm" style={{fontSize: '14px'}}>M</span>
                         </div>
                       );
-                    } else if (sexo === 'femea') {
+                    } else if (sexoLower === 'femea' || sexoLower === 'f' || sexoLower === 'fêmea') {
                       return (
                         <div className="w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center">
                           <span className="text-white font-bold text-sm" style={{fontSize: '14px'}}>F</span>
