@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Search, Filter } from 'lucide-react';
 import LeishmaniasisForm from './LeishmaniasisForm';
 import LeishmaniasisList from './LeishmaniasisList';
+import CaseDetailsModal from './CaseDetailsModal';
 
 // Interface para os casos de leishmaniose
 interface LeishmaniasisCase {
@@ -37,6 +38,8 @@ const LeishmaniasisControl: React.FC<LeishmaniasisControlProps> = ({
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedCase, setSelectedCase] = useState<LeishmaniasisCase | null>(null);
+  const [editingCase, setEditingCase] = useState<LeishmaniasisCase | null>(null);
 
   // Filtrar casos baseado na busca e status
   const filteredCases = cases.filter(case_ => {
@@ -50,6 +53,14 @@ const LeishmaniasisControl: React.FC<LeishmaniasisControlProps> = ({
   const handleSubmit = (formData: any) => {
     onAddCase(formData);
     setShowForm(false);
+  };
+
+  const handleView = (case_: LeishmaniasisCase) => {
+    setSelectedCase(case_);
+  };
+
+  const handleEdit = (case_: LeishmaniasisCase) => {
+    setEditingCase(case_);
   };
 
   return (
@@ -104,8 +115,30 @@ const LeishmaniasisControl: React.FC<LeishmaniasisControlProps> = ({
         <LeishmaniasisList 
           cases={filteredCases} 
           onDelete={onDeleteCase}
+          onView={handleView}
+          onEdit={handleEdit}
         />
       </div>
+
+      {/* Modal de Visualização */}
+      {selectedCase && (
+        <CaseDetailsModal 
+          case_={selectedCase} 
+          onClose={() => setSelectedCase(null)} 
+        />
+      )}
+
+      {/* Modal de Edição */}
+      {editingCase && (
+        <LeishmaniasisForm 
+          onClose={() => setEditingCase(null)} 
+          onSubmit={(formData) => {
+            // Aqui você pode implementar a lógica de edição
+            console.log('Editando caso:', editingCase.id, formData);
+            setEditingCase(null);
+          }} 
+        />
+      )}
     </div>
   );
 };

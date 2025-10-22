@@ -23,9 +23,11 @@ interface LeishmaniasisCase {
 interface LeishmaniasisListProps {
   cases: LeishmaniasisCase[];
   onDelete: (id: number) => void;
+  onView?: (case_: LeishmaniasisCase) => void;
+  onEdit?: (case_: LeishmaniasisCase) => void;
 }
 
-const LeishmaniasisList: React.FC<LeishmaniasisListProps> = ({ cases, onDelete }) => {
+const LeishmaniasisList: React.FC<LeishmaniasisListProps> = ({ cases, onDelete, onView, onEdit }) => {
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       notificado: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
@@ -143,12 +145,14 @@ const LeishmaniasisList: React.FC<LeishmaniasisListProps> = ({ cases, onDelete }
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex space-x-2">
                     <button 
+                      onClick={() => onView?.(caso)}
                       className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
                       title="Visualizar"
                     >
                       <Eye className="h-4 w-4" />
                     </button>
                     <button 
+                      onClick={() => onEdit?.(caso)}
                       className="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300 transition-colors"
                       title="Editar"
                     >
@@ -184,12 +188,14 @@ const LeishmaniasisList: React.FC<LeishmaniasisListProps> = ({ cases, onDelete }
               </div>
               <div className="flex space-x-2 ml-2">
                 <button 
+                  onClick={() => onView?.(caso)}
                   className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors p-2 rounded-md hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
                   title="Visualizar"
                 >
                   <Eye className="h-4 w-4" />
                 </button>
                 <button 
+                  onClick={() => onEdit?.(caso)}
                   className="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300 transition-colors p-2 rounded-md hover:bg-yellow-50 dark:hover:bg-yellow-900/20"
                   title="Editar"
                 >
