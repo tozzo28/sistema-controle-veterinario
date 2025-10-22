@@ -244,7 +244,6 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
                   
                   const getSexIcon = (sexo: string) => {
                     const sexoLower = sexo?.toLowerCase()?.trim();
-                    console.log('Sexo recebido:', sexo, 'SexoLower:', sexoLower);
                     
                     if (sexoLower === 'macho' || sexoLower === 'm') {
                       return (
