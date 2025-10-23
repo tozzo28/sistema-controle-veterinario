@@ -29,50 +29,66 @@ export const geocodeAddress = async (address: string): Promise<GeocodingResult> 
       searchAddress = `${address}, Paraguaçu Paulista, SP, Brasil`;
     }
 
-    // URL do Nominatim para geocodificação
-    const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}&limit=1&countrycodes=br&addressdetails=1`;
-    
-    console.log('🌐 URL de busca:', nominatimUrl);
+    // Tentar múltiplas estratégias de busca
+    const searchStrategies = [
+      // Estratégia 1: Busca completa
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}&limit=1&countrycodes=br&addressdetails=1`,
+      // Estratégia 2: Busca mais específica para Paraguaçu
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)} Paraguaçu Paulista SP Brasil&limit=1&countrycodes=br&addressdetails=1`,
+      // Estratégia 3: Busca apenas com cidade
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)} Paraguaçu Paulista&limit=1&countrycodes=br&addressdetails=1`
+    ];
 
-    const response = await fetch(nominatimUrl, {
-      headers: {
-        'User-Agent': 'Sistema-Controle-Veterinario/1.0',
-        'Accept': 'application/json'
+    for (let i = 0; i < searchStrategies.length; i++) {
+      const url = searchStrategies[i];
+      console.log(`🌐 Tentativa ${i + 1}/3 - URL:`, url);
+
+      try {
+        const response = await fetch(url, {
+          headers: {
+            'User-Agent': 'Sistema-Controle-Veterinario/1.0',
+            'Accept': 'application/json'
+          }
+        });
+
+        console.log(`📡 Status da resposta (tentativa ${i + 1}):`, response.status);
+
+        if (!response.ok) {
+          console.log(`❌ Erro na tentativa ${i + 1}:`, response.status);
+          continue;
+        }
+
+        const data = await response.json();
+        console.log(`📊 Dados recebidos (tentativa ${i + 1}):`, data);
+
+        if (data && data.length > 0) {
+          const result = data[0];
+          const lat = parseFloat(result.lat);
+          const lng = parseFloat(result.lon);
+          const formattedAddress = result.display_name || address;
+
+          console.log(`✅ Geocodificação bem-sucedida (tentativa ${i + 1}):`, { lat, lng, address: formattedAddress });
+
+          return {
+            lat,
+            lng,
+            address: formattedAddress,
+            success: true
+          };
+        }
+      } catch (error) {
+        console.log(`❌ Erro na tentativa ${i + 1}:`, error);
+        continue;
       }
-    });
-
-    console.log('📡 Status da resposta:', response.status);
-
-    if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.status}`);
     }
 
-    const data = await response.json();
-    console.log('📊 Dados recebidos:', data);
-
-    if (!data || data.length === 0) {
-      console.log('❌ Nenhum resultado encontrado');
-      return {
-        lat: 0,
-        lng: 0,
-        address: address,
-        success: false,
-        error: 'Endereço não encontrado'
-      };
-    }
-
-    const result = data[0];
-    const lat = parseFloat(result.lat);
-    const lng = parseFloat(result.lon);
-    const formattedAddress = result.display_name || address;
-
-    console.log('✅ Geocodificação bem-sucedida:', { lat, lng, address: formattedAddress });
-
+    console.log('❌ Todas as tentativas falharam');
     return {
-      lat,
-      lng,
-      address: formattedAddress,
-      success: true
+      lat: 0,
+      lng: 0,
+      address: address,
+      success: false,
+      error: 'Endereço não encontrado após múltiplas tentativas'
     };
 
   } catch (error) {
@@ -96,11 +112,14 @@ export const geocodeWithFallback = async (address: string, area: string, quadra:
     return result;
   }
 
+  console.log('🔄 Tentando fallback com área e quadra...');
+
   // Se falhar, tenta geocodificar com área e quadra
   const areaAddress = `${area}, Paraguaçu Paulista, SP, Brasil`;
   const areaResult = await geocodeAddress(areaAddress);
   
   if (areaResult.success) {
+    console.log('✅ Área encontrada, aplicando offset da quadra...');
     // Adiciona pequena variação baseada na quadra
     const quadraOffsets: { [key: string]: [number, number] } = {
       'A': [0.002, 0.002],
@@ -122,11 +141,28 @@ export const geocodeWithFallback = async (address: string, area: string, quadra:
     };
   }
 
-  // Se tudo falhar, usa coordenadas de Paraguaçu/SP
+  console.log('🔄 Usando coordenadas aproximadas de Paraguaçu/SP...');
+  
+  // Se tudo falhar, usa coordenadas de Paraguaçu/SP com variação baseada no endereço
+  const baseLat = -22.4114;
+  const baseLng = -50.5739;
+  
+  // Gerar coordenadas baseadas no hash do endereço para consistência
+  let hash = 0;
+  for (let i = 0; i < address.length; i++) {
+    const char = address.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  
+  // Usar hash para gerar offset consistente
+  const latOffset = ((hash % 1000) - 500) / 100000; // Variação de ~0.005 graus
+  const lngOffset = (((hash >> 10) % 1000) - 500) / 100000;
+  
   return {
-    lat: -22.4114,
-    lng: -50.5739,
-    address: `Paraguaçu Paulista, SP (coordenadas aproximadas)`,
+    lat: baseLat + latOffset,
+    lng: baseLng + lngOffset,
+    address: `${address} (coordenadas aproximadas - Paraguaçu Paulista, SP)`,
     success: false,
     error: 'Usando coordenadas aproximadas de Paraguaçu/SP'
   };

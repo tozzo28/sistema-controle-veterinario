@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { AlertTriangle, Syringe, Activity, Shield } from 'lucide-react';
 import StatCard from './StatCard';
-import Charts from './Charts';
 import MapView from './MapView';
+import GeocodingTest from './GeocodingTest';
 
 interface LeishmaniasisCase {
   id: number;
@@ -480,6 +480,11 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Teste de Geocodificação */}
+      <section>
+        <GeocodingTest />
       </section>
     </div>
   );
