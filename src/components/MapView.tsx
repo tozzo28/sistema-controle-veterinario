@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { MapPin, AlertTriangle, Activity, Shield, RefreshCw } from 'lucide-react';
-import { geocodeWithFallback } from '../services/geocoding';
+import { geocodeWithGoogleFallback } from '../services/googleGeocoding';
 
 // Suprimir warnings obsoletos do Mozilla
 const originalWarn = console.warn;
@@ -137,7 +137,7 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
       leishmaniasisCases.map(async (case_, index) => {
         console.log(`📍 Processando caso ${index + 1}:`, case_.nomeAnimal, case_.endereco);
         
-        const geocodingResult = await geocodeWithFallback(
+        const geocodingResult = await geocodeWithGoogleFallback(
           case_.endereco || '', 
           case_.area, 
           case_.quadra
