@@ -108,12 +108,21 @@ export const geocodeWithFallback = async (address: string, area: string, quadra:
   // Primeiro tenta geocodificar o endereço completo
   const result = await geocodeAddress(address);
   
-  if (result.success) {
+  // Verificar se a geocodificação retornou coordenadas genéricas da cidade
+  const isGenericCityResult = result.success && 
+    result.address.includes('Paraguaçu Paulista') && 
+    result.address.includes('Região Imediata de Assis');
+  
+  if (result.success && !isGenericCityResult) {
     console.log('✅ Geocodificação real bem-sucedida:', result);
     return result;
   }
 
-  console.log('⚠️ Geocodificação real falhou, usando coordenadas reais de Paraguaçu Paulista...');
+  if (isGenericCityResult) {
+    console.log('⚠️ Geocodificação retornou apenas a cidade genérica, usando distribuição inteligente...');
+  } else {
+    console.log('⚠️ Geocodificação real falhou, usando coordenadas reais de Paraguaçu Paulista...');
+  }
   
   // Usar coordenadas reais de Paraguaçu Paulista com distribuição inteligente
   const baseLat = -22.4114; // Centro de Paraguaçu Paulista
@@ -135,11 +144,13 @@ export const geocodeWithFallback = async (address: string, area: string, quadra:
   const finalLat = baseLat + latOffset;
   const finalLng = baseLng + lngOffset;
   
-  console.log('📍 Coordenadas reais de Paraguaçu Paulista:', { 
+  console.log('📍 Coordenadas distribuídas de Paraguaçu Paulista:', { 
     lat: finalLat, 
     lng: finalLng,
     endereco: address,
-    hash: hash
+    hash: hash,
+    latOffset: latOffset,
+    lngOffset: lngOffset
   });
   
   return {
