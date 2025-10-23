@@ -103,6 +103,12 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
     );
     
     console.log('🗺️ Casos processados:', processedCases);
+    console.log('📍 Casos com coordenadas válidas:', processedCases.filter(c => 
+      c.coordinates && 
+      c.coordinates.length === 2 && 
+      !isNaN(c.coordinates[0]) && 
+      !isNaN(c.coordinates[1])
+    ));
     setMapCases(processedCases);
     setIsLoading(false);
   };
@@ -242,9 +248,7 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
               case_.coordinates && 
               case_.coordinates.length === 2 && 
               !isNaN(case_.coordinates[0]) && 
-              !isNaN(case_.coordinates[1]) &&
-              case_.coordinates[0] !== 0 && 
-              case_.coordinates[1] !== 0
+              !isNaN(case_.coordinates[1])
             ).map((case_) => {
               // Cor do marcador baseada no status
               const getMarkerColor = (status: string) => {

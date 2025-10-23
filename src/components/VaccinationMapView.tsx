@@ -241,9 +241,7 @@ const VaccinationMapView: React.FC<VaccinationMapViewProps> = ({ vaccinationReco
               record.coordinates && 
               record.coordinates.length === 2 && 
               !isNaN(record.coordinates[0]) && 
-              !isNaN(record.coordinates[1]) &&
-              record.coordinates[0] !== 0 && 
-              record.coordinates[1] !== 0
+              !isNaN(record.coordinates[1])
             ).map((record) => {
               // Cor do marcador baseada no tipo e se perdeu dose
               const getMarkerColor = (tipo: string, dosePerdida: boolean) => {

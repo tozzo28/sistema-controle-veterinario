@@ -159,9 +159,14 @@ export const geocodeWithFallback = async (address: string, area: string, quadra:
   const latOffset = ((hash % 1000) - 500) / 100000; // Variação de ~0.005 graus
   const lngOffset = (((hash >> 10) % 1000) - 500) / 100000;
   
+  const finalLat = baseLat + latOffset;
+  const finalLng = baseLng + lngOffset;
+  
+  console.log('📍 Coordenadas aproximadas geradas:', { lat: finalLat, lng: finalLng });
+  
   return {
-    lat: baseLat + latOffset,
-    lng: baseLng + lngOffset,
+    lat: finalLat,
+    lng: finalLng,
     address: `${address} (coordenadas aproximadas - Paraguaçu Paulista, SP)`,
     success: false,
     error: 'Usando coordenadas aproximadas de Paraguaçu/SP'
