@@ -21,22 +21,37 @@ export const geocodeAddress = async (address: string): Promise<GeocodingResult> 
       };
     }
 
+    console.log('🔍 Geocodificando endereço:', address);
+
+    // Adicionar Paraguaçu Paulista, SP se não estiver no endereço
+    let searchAddress = address;
+    if (!address.toLowerCase().includes('paraguaçu') && !address.toLowerCase().includes('paulista')) {
+      searchAddress = `${address}, Paraguaçu Paulista, SP, Brasil`;
+    }
+
     // URL do Nominatim para geocodificação
-    const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=br&addressdetails=1`;
+    const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}&limit=1&countrycodes=br&addressdetails=1`;
     
+    console.log('🌐 URL de busca:', nominatimUrl);
+
     const response = await fetch(nominatimUrl, {
       headers: {
-        'User-Agent': 'Sistema-Controle-Veterinario/1.0'
+        'User-Agent': 'Sistema-Controle-Veterinario/1.0',
+        'Accept': 'application/json'
       }
     });
+
+    console.log('📡 Status da resposta:', response.status);
 
     if (!response.ok) {
       throw new Error(`Erro na requisição: ${response.status}`);
     }
 
     const data = await response.json();
+    console.log('📊 Dados recebidos:', data);
 
     if (!data || data.length === 0) {
+      console.log('❌ Nenhum resultado encontrado');
       return {
         lat: 0,
         lng: 0,
@@ -51,6 +66,8 @@ export const geocodeAddress = async (address: string): Promise<GeocodingResult> 
     const lng = parseFloat(result.lon);
     const formattedAddress = result.display_name || address;
 
+    console.log('✅ Geocodificação bem-sucedida:', { lat, lng, address: formattedAddress });
+
     return {
       lat,
       lng,
@@ -59,7 +76,7 @@ export const geocodeAddress = async (address: string): Promise<GeocodingResult> 
     };
 
   } catch (error) {
-    console.error('Erro na geocodificação:', error);
+    console.error('❌ Erro na geocodificação:', error);
     return {
       lat: 0,
       lng: 0,

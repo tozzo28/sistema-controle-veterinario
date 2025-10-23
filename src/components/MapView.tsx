@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { MapPin, AlertTriangle, Activity, Shield } from 'lucide-react';
+import { MapPin, AlertTriangle, Activity, Shield, RefreshCw } from 'lucide-react';
 import { geocodeWithFallback } from '../services/geocoding';
 import 'leaflet/dist/leaflet.css';
 
@@ -68,34 +68,49 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
   const [mapCenter, setMapCenter] = useState<[number, number]>(PARAGUACU_COORDS);
   const [mapCases, setMapCases] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Função para processar casos
+  const processCases = async () => {
+    console.log('🔄 Processando casos para o mapa...', leishmaniasisCases);
+    setIsLoading(true);
+    
+    const processedCases = await Promise.all(
+      leishmaniasisCases.map(async (case_, index) => {
+        console.log(`📍 Processando caso ${index + 1}:`, case_.nomeAnimal, case_.endereco);
+        
+        const geocodingResult = await geocodeWithFallback(
+          case_.endereco || '', 
+          case_.area, 
+          case_.quadra
+        );
+        
+        console.log(`✅ Resultado geocodificação para ${case_.nomeAnimal}:`, geocodingResult);
+        
+        return {
+          ...case_,
+          coordinates: [geocodingResult.lat, geocodingResult.lng] as [number, number],
+          geocodedAddress: geocodingResult.address,
+          geocodingSuccess: geocodingResult.success
+        };
+      })
+    );
+    
+    console.log('🗺️ Casos processados:', processedCases);
+    setMapCases(processedCases);
+    setIsLoading(false);
+  };
 
   // Processar casos para o mapa com geocodificação real
   useEffect(() => {
-    const processCases = async () => {
-      setIsLoading(true);
-      const processedCases = await Promise.all(
-        leishmaniasisCases.map(async (case_) => {
-          const geocodingResult = await geocodeWithFallback(
-            case_.endereco || '', 
-            case_.area, 
-            case_.quadra
-          );
-          
-          return {
-            ...case_,
-            coordinates: [geocodingResult.lat, geocodingResult.lng] as [number, number],
-            geocodedAddress: geocodingResult.address,
-            geocodingSuccess: geocodingResult.success
-          };
-        })
-      );
-      
-      setMapCases(processedCases);
-      setIsLoading(false);
-    };
-
     processCases();
-  }, [leishmaniasisCases]);
+  }, [leishmaniasisCases, refreshKey]);
+
+  // Função para forçar refresh
+  const handleRefresh = () => {
+    console.log('🔄 Forçando refresh do mapa...');
+    setRefreshKey(prev => prev + 1);
+  };
 
   // Estatísticas do mapa
   const stats = {
@@ -181,10 +196,20 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
 
       {/* Mapa */}
       <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 flex items-center">
-          <MapPin className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-blue-600" />
-          Mapa de Casos - Paraguaçu/SP
-        </h3>
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+            <MapPin className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-blue-600" />
+            Mapa de Casos - Paraguaçu/SP
+          </h3>
+          <button
+            onClick={handleRefresh}
+            disabled={isLoading}
+            className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+          >
+            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <span>Atualizar</span>
+          </button>
+        </div>
         
         <div className="h-80 sm:h-96 md:h-[500px] w-full rounded-lg overflow-hidden">
           <MapContainer

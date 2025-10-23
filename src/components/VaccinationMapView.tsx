@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { MapPin, Shield, Calendar, User } from 'lucide-react';
+import { MapPin, Shield, Calendar, User, RefreshCw } from 'lucide-react';
 import { geocodeWithFallback } from '../services/geocoding';
 import 'leaflet/dist/leaflet.css';
 
@@ -67,34 +67,49 @@ const VaccinationMapView: React.FC<VaccinationMapViewProps> = ({ vaccinationReco
   const [mapCenter, setMapCenter] = useState<[number, number]>(PARAGUACU_COORDS);
   const [mapRecords, setMapRecords] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Função para processar registros
+  const processRecords = async () => {
+    console.log('🔄 Processando registros de vacinação...', vaccinationRecords);
+    setIsLoading(true);
+    
+    const processedRecords = await Promise.all(
+      vaccinationRecords.map(async (record, index) => {
+        console.log(`📍 Processando registro ${index + 1}:`, record.nomeAnimal, record.endereco);
+        
+        const geocodingResult = await geocodeWithFallback(
+          record.endereco || '', 
+          record.area, 
+          record.quadra
+        );
+        
+        console.log(`✅ Resultado geocodificação para ${record.nomeAnimal}:`, geocodingResult);
+        
+        return {
+          ...record,
+          coordinates: [geocodingResult.lat, geocodingResult.lng] as [number, number],
+          geocodedAddress: geocodingResult.address,
+          geocodingSuccess: geocodingResult.success
+        };
+      })
+    );
+    
+    console.log('🗺️ Registros processados:', processedRecords);
+    setMapRecords(processedRecords);
+    setIsLoading(false);
+  };
 
   // Processar registros para o mapa com geocodificação real
   useEffect(() => {
-    const processRecords = async () => {
-      setIsLoading(true);
-      const processedRecords = await Promise.all(
-        vaccinationRecords.map(async (record) => {
-          const geocodingResult = await geocodeWithFallback(
-            record.endereco || '', 
-            record.area, 
-            record.quadra
-          );
-          
-          return {
-            ...record,
-            coordinates: [geocodingResult.lat, geocodingResult.lng] as [number, number],
-            geocodedAddress: geocodingResult.address,
-            geocodingSuccess: geocodingResult.success
-          };
-        })
-      );
-      
-      setMapRecords(processedRecords);
-      setIsLoading(false);
-    };
-
     processRecords();
-  }, [vaccinationRecords]);
+  }, [vaccinationRecords, refreshKey]);
+
+  // Função para forçar refresh
+  const handleRefresh = () => {
+    console.log('🔄 Forçando refresh do mapa de vacinação...');
+    setRefreshKey(prev => prev + 1);
+  };
 
   // Estatísticas do mapa
   const stats = {
@@ -180,10 +195,20 @@ const VaccinationMapView: React.FC<VaccinationMapViewProps> = ({ vaccinationReco
 
       {/* Mapa */}
       <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 flex items-center">
-          <MapPin className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-green-600" />
-          Mapa de Vacinações - Paraguaçu/SP
-        </h3>
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+            <MapPin className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-green-600" />
+            Mapa de Vacinações - Paraguaçu/SP
+          </h3>
+          <button
+            onClick={handleRefresh}
+            disabled={isLoading}
+            className="flex items-center space-x-2 px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+          >
+            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <span>Atualizar</span>
+          </button>
+        </div>
         
         <div className="h-80 sm:h-96 md:h-[500px] w-full rounded-lg overflow-hidden">
           <MapContainer
