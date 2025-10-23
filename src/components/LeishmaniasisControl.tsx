@@ -136,7 +136,8 @@ const LeishmaniasisControl: React.FC<LeishmaniasisControlProps> = ({
             // Aqui você pode implementar a lógica de edição
             console.log('Editando caso:', editingCase.id, formData);
             setEditingCase(null);
-          }} 
+          }}
+          initialData={editingCase}
         />
       )}
     </div>

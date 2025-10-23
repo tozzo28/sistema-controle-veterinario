@@ -4,31 +4,32 @@ import { X } from 'lucide-react';
 interface LeishmaniasisFormProps {
   onClose: () => void;
   onSubmit: (data: any) => void;
+  initialData?: any;
 }
 
-const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit }) => {
+const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit, initialData }) => {
   const [formData, setFormData] = useState({
     // Dados do animal
-    nomeAnimal: '',
-    tipoAnimal: 'cao', // Novo campo para tipo de animal
-    idade: '',
-    raca: '',
-    sexo: '',
-    pelagem: '',
-    corPelagem: '',
+    nomeAnimal: initialData?.nomeAnimal || '',
+    tipoAnimal: initialData?.tipoAnimal || 'cao',
+    idade: initialData?.idade || '',
+    raca: initialData?.raca || '',
+    sexo: initialData?.sexo || '',
+    pelagem: initialData?.pelagem || '',
+    corPelagem: initialData?.corPelagem || '',
     
     // Dados do tutor
-    nomeTutor: '',
-    cpf: '',
-    telefone: '',
-    endereco: '',
+    nomeTutor: initialData?.nomeTutor || '',
+    cpf: initialData?.cpf || '',
+    telefone: initialData?.telefone || '',
+    endereco: initialData?.endereco || '',
     
     // Georreferenciamento
-    quadra: '',
-    area: '',
+    quadra: initialData?.quadra || '',
+    area: initialData?.area || '',
     
     // Status
-    status: 'notificado',
+    status: initialData?.status || 'notificado',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -55,7 +56,9 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[95vh] overflow-y-auto">
         <div className="flex items-center justify-between p-3 sm:p-4 lg:p-6 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 dark:text-white">Cadastrar Novo Caso - Leishmaniose</h3>
+          <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900 dark:text-white">
+            {initialData ? 'Editar Caso - Leishmaniose' : 'Cadastrar Novo Caso - Leishmaniose'}
+          </h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 -m-2"
@@ -300,7 +303,7 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
               type="submit"
               className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-base sm:text-sm font-medium"
             >
-              Salvar Caso
+{initialData ? 'Atualizar Caso' : 'Salvar Caso'}
             </button>
           </div>
         </form>
