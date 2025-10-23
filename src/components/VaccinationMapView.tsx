@@ -67,11 +67,22 @@ const MapCenter: React.FC<{ center: [number, number] }> = ({ center }) => {
   
   useEffect(() => {
     if (map && center && center.length === 2 && !isNaN(center[0]) && !isNaN(center[1])) {
-      try {
-        map.setView(center, 13);
-      } catch (error) {
-        console.error('Erro ao centralizar mapa:', error);
-      }
+      const setMapView = () => {
+        try {
+          // Verificar se o mapa está realmente pronto
+          if (map && map.getContainer() && map.getContainer().querySelector('.leaflet-tile-pane')) {
+            map.setView(center, 13);
+          } else {
+            // Se não estiver pronto, tentar novamente em 100ms
+            setTimeout(setMapView, 100);
+          }
+        } catch (error) {
+          console.error('Erro ao centralizar mapa:', error);
+        }
+      };
+      
+      // Aguardar um pouco antes de tentar centralizar
+      setTimeout(setMapView, 300);
     }
   }, [map, center]);
   

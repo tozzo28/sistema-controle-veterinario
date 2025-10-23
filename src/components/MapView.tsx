@@ -68,16 +68,22 @@ const PARAGUACU_COORDS: [number, number] = [-22.4114, -50.5739];
     
     useEffect(() => {
       if (map && center && center.length === 2 && !isNaN(center[0]) && !isNaN(center[1])) {
-        try {
-          // Aguardar um pouco para garantir que o mapa esteja totalmente carregado
-          setTimeout(() => {
-            if (map && map.getContainer()) {
+        const setMapView = () => {
+          try {
+            // Verificar se o mapa está realmente pronto
+            if (map && map.getContainer() && map.getContainer().querySelector('.leaflet-tile-pane')) {
               map.setView(center, 13);
+            } else {
+              // Se não estiver pronto, tentar novamente em 100ms
+              setTimeout(setMapView, 100);
             }
-          }, 200);
-        } catch (error) {
-          console.error('Erro ao centralizar mapa:', error);
-        }
+          } catch (error) {
+            console.error('Erro ao centralizar mapa:', error);
+          }
+        };
+        
+        // Aguardar um pouco antes de tentar centralizar
+        setTimeout(setMapView, 300);
       }
     }, [map, center]);
     
