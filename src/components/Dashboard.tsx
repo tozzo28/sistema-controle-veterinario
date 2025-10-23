@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AlertTriangle, Syringe, Activity, Shield } from 'lucide-react';
 import StatCard from './StatCard';
-import MapView from './MapView';
+import MapToggle from './MapToggle';
 import GeocodingTest from './GeocodingTest';
 
 interface LeishmaniasisCase {
@@ -94,7 +94,7 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
       {/* Mapa de Georreferenciamento */}
       <section>
         <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">Mapa de Casos</h3>
-        <MapView leishmaniasisCases={leishmaniasisCases} />
+        <MapToggle leishmaniasisCases={leishmaniasisCases} />
       </section>
 
       {/* Análise de Distribuição */}
