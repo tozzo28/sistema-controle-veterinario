@@ -31,12 +31,12 @@ export const geocodeAddress = async (address: string): Promise<GeocodingResult> 
 
     // Tentar múltiplas estratégias de busca
     const searchStrategies = [
-      // Estratégia 1: Busca apenas com cidade (mais provável de funcionar)
-      `https://nominatim.openstreetmap.org/search?format=json&q=Paraguaçu Paulista SP Brasil&limit=1&countrycodes=br&addressdetails=1`,
+      // Estratégia 1: Busca completa (mais específica)
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}&limit=1&countrycodes=br&addressdetails=1`,
       // Estratégia 2: Busca com endereço + cidade
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)} Paraguaçu Paulista&limit=1&countrycodes=br&addressdetails=1`,
-      // Estratégia 3: Busca completa
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}&limit=1&countrycodes=br&addressdetails=1`
+      // Estratégia 3: Busca apenas com cidade (fallback)
+      `https://nominatim.openstreetmap.org/search?format=json&q=Paraguaçu Paulista SP Brasil&limit=1&countrycodes=br&addressdetails=1`
     ];
 
     for (let i = 0; i < searchStrategies.length; i++) {
@@ -155,9 +155,9 @@ export const geocodeWithFallback = async (address: string, area: string, quadra:
     hash = hash & hash; // Convert to 32bit integer
   }
   
-  // Usar hash para gerar offset consistente
-  const latOffset = ((hash % 1000) - 500) / 100000; // Variação de ~0.005 graus
-  const lngOffset = (((hash >> 10) % 1000) - 500) / 100000;
+  // Usar hash para gerar offset consistente com maior variação
+  const latOffset = ((hash % 2000) - 1000) / 50000; // Variação de ~0.02 graus (maior área)
+  const lngOffset = (((hash >> 10) % 2000) - 1000) / 50000;
   
   const finalLat = baseLat + latOffset;
   const finalLng = baseLng + lngOffset;

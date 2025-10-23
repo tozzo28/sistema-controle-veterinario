@@ -298,6 +298,11 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
               !isNaN(case_.coordinates[0]) && 
               !isNaN(case_.coordinates[1])
             ).map((case_) => {
+              console.log('📍 Renderizando marcador:', {
+                nome: case_.nomeAnimal,
+                status: case_.status,
+                coordinates: case_.coordinates
+              });
               // Cor do marcador baseada no status
               const getMarkerColor = (status: string) => {
                 switch (status) {
