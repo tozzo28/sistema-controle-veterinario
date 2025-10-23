@@ -98,6 +98,10 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
 
   // Configurar ícones personalizados para evitar OpaqueResponseBlocking
   useEffect(() => {
+    // Desabilitar ícones padrão do Leaflet para evitar OpaqueResponseBlocking
+    L.Icon.Default.prototype.options.iconUrl = '';
+    L.Icon.Default.prototype.options.shadowUrl = '';
+    
     const createCustomIcon = (color: string) => {
       return L.divIcon({
         className: 'custom-div-icon',
@@ -151,12 +155,18 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
     );
     
     console.log('🗺️ Casos processados:', processedCases);
-    console.log('📍 Casos com coordenadas válidas:', processedCases.filter(c => 
+    const validCases = processedCases.filter(c => 
       c.coordinates && 
       c.coordinates.length === 2 && 
       !isNaN(c.coordinates[0]) && 
       !isNaN(c.coordinates[1])
-    ));
+    );
+    console.log('📍 Casos com coordenadas válidas:', validCases.length, 'de', processedCases.length);
+    console.log('📍 Detalhes dos casos válidos:', validCases.map(c => ({
+      nome: c.nomeAnimal,
+      status: c.status,
+      coordinates: c.coordinates
+    })));
     setMapCases(processedCases);
     setIsLoading(false);
   };

@@ -97,6 +97,10 @@ const VaccinationMapView: React.FC<VaccinationMapViewProps> = ({ vaccinationReco
 
   // Configurar ícones personalizados para evitar OpaqueResponseBlocking
   useEffect(() => {
+    // Desabilitar ícones padrão do Leaflet para evitar OpaqueResponseBlocking
+    L.Icon.Default.prototype.options.iconUrl = '';
+    L.Icon.Default.prototype.options.shadowUrl = '';
+    
     const createCustomIcon = (color: string) => {
       return L.divIcon({
         className: 'custom-div-icon',
