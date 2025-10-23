@@ -31,12 +31,12 @@ export const geocodeAddress = async (address: string): Promise<GeocodingResult> 
 
     // Tentar múltiplas estratégias de busca
     const searchStrategies = [
-      // Estratégia 1: Busca completa
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}&limit=1&countrycodes=br&addressdetails=1`,
-      // Estratégia 2: Busca mais específica para Paraguaçu
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)} Paraguaçu Paulista SP Brasil&limit=1&countrycodes=br&addressdetails=1`,
-      // Estratégia 3: Busca apenas com cidade
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)} Paraguaçu Paulista&limit=1&countrycodes=br&addressdetails=1`
+      // Estratégia 1: Busca apenas com cidade (mais provável de funcionar)
+      `https://nominatim.openstreetmap.org/search?format=json&q=Paraguaçu Paulista SP Brasil&limit=1&countrycodes=br&addressdetails=1`,
+      // Estratégia 2: Busca com endereço + cidade
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)} Paraguaçu Paulista&limit=1&countrycodes=br&addressdetails=1`,
+      // Estratégia 3: Busca completa
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}&limit=1&countrycodes=br&addressdetails=1`
     ];
 
     for (let i = 0; i < searchStrategies.length; i++) {

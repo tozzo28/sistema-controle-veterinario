@@ -58,7 +58,13 @@ const MapCenter: React.FC<{ center: [number, number] }> = ({ center }) => {
   const map = useMap();
   
   useEffect(() => {
-    map.setView(center, 13);
+    if (map && center && center.length === 2 && !isNaN(center[0]) && !isNaN(center[1])) {
+      try {
+        map.setView(center, 13);
+      } catch (error) {
+        console.error('Erro ao centralizar mapa:', error);
+      }
+    }
   }, [map, center]);
   
   return null;
@@ -232,7 +238,14 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
               subdomains={[]}
             />
             
-            {mapCases.map((case_) => {
+            {mapCases.filter(case_ => 
+              case_.coordinates && 
+              case_.coordinates.length === 2 && 
+              !isNaN(case_.coordinates[0]) && 
+              !isNaN(case_.coordinates[1]) &&
+              case_.coordinates[0] !== 0 && 
+              case_.coordinates[1] !== 0
+            ).map((case_) => {
               // Cor do marcador baseada no status
               const getMarkerColor = (status: string) => {
                 switch (status) {
