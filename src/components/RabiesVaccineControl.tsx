@@ -2,17 +2,27 @@ import React, { useEffect, useState } from 'react';
 import { Plus, Search, Filter } from 'lucide-react';
 import RabiesVaccineForm from './RabiesVaccineForm';
 import RabiesVaccineList from './RabiesVaccineList';
+import VaccinationMapView from './VaccinationMapView';
 
 const RabiesVaccineControl: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [onlyLost, setOnlyLost] = useState(false);
+  const [vaccinationRecords, setVaccinationRecords] = useState([]);
 
   const [stats, setStats] = useState({ total: 0, caes: 0, gatos: 0, dosesPerdidas: 0 });
 
   useEffect(() => {
     fetch('/.netlify/functions/api-rabies-stats-simple').then(r => r.json()).then(setStats).catch(() => setStats({ total: 0, caes: 0, gatos: 0, dosesPerdidas: 0 }));
+  }, []);
+
+  useEffect(() => {
+    // Carregar registros de vacinação para o mapa
+    fetch('/.netlify/functions/api-rabies-list')
+      .then(r => r.json())
+      .then(setVaccinationRecords)
+      .catch(() => setVaccinationRecords([]));
   }, []);
 
   return (
@@ -84,6 +94,11 @@ const RabiesVaccineControl: React.FC = () => {
         </div>
 
         <RabiesVaccineList searchTerm={searchTerm} filterType={filterType} onlyLost={onlyLost} />
+      </div>
+
+      {/* Mapa de Vacinações */}
+      <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <VaccinationMapView vaccinationRecords={vaccinationRecords} />
       </div>
     </div>
   );
