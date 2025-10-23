@@ -35,6 +35,16 @@ export async function createCase(data: Omit<LeishmaniasisCase, 'id' | 'dataNotif
   return res.json();
 }
 
+export async function updateCase(id: number, data: Omit<LeishmaniasisCase, 'id' | 'dataNotificacao'>): Promise<LeishmaniasisCase> {
+  const res = await fetch(`${BASE_URL}/.netlify/functions/api-cases-simple`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, ...data }),
+  });
+  if (!res.ok) throw new Error('Falha ao atualizar caso');
+  return res.json();
+}
+
 export async function deleteCase(id: number): Promise<void> {
   const res = await fetch(`${BASE_URL}/.netlify/functions/api-cases-simple`, { 
     method: 'DELETE',

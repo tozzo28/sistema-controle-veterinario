@@ -3,6 +3,7 @@ import { Plus, Search, Filter } from 'lucide-react';
 import LeishmaniasisForm from './LeishmaniasisForm';
 import LeishmaniasisList from './LeishmaniasisList';
 import CaseDetailsModal from './CaseDetailsModal';
+import { updateCase } from '../api';
 
 // Interface para os casos de leishmaniose
 interface LeishmaniasisCase {
@@ -61,6 +62,29 @@ const LeishmaniasisControl: React.FC<LeishmaniasisControlProps> = ({
 
   const handleEdit = (case_: LeishmaniasisCase) => {
     setEditingCase(case_);
+  };
+
+  const handleUpdateCase = async (formData: any) => {
+    if (!editingCase) return;
+    
+    try {
+      console.log('🔄 Atualizando caso:', editingCase.id, formData);
+      
+      // Atualizar o caso no banco de dados
+      const updatedCase = await updateCase(editingCase.id, formData);
+      
+      console.log('✅ Caso atualizado com sucesso:', updatedCase);
+      
+      // Fechar o modal de edição
+      setEditingCase(null);
+      
+      // Recarregar a página para atualizar a lista
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('❌ Erro ao atualizar caso:', error);
+      alert('Erro ao atualizar caso. Tente novamente.');
+    }
   };
 
   return (
@@ -132,11 +156,7 @@ const LeishmaniasisControl: React.FC<LeishmaniasisControlProps> = ({
       {editingCase && (
         <LeishmaniasisForm 
           onClose={() => setEditingCase(null)} 
-          onSubmit={(formData) => {
-            // Aqui você pode implementar a lógica de edição
-            console.log('Editando caso:', editingCase.id, formData);
-            setEditingCase(null);
-          }}
+          onSubmit={handleUpdateCase}
           initialData={editingCase}
         />
       )}
