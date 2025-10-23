@@ -3,6 +3,15 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { MapPin, Shield, Calendar, User, RefreshCw } from 'lucide-react';
 import { geocodeWithFallback } from '../services/geocoding';
+
+// Suprimir warnings obsoletos do Mozilla
+const originalWarn = console.warn;
+console.warn = (...args) => {
+  if (args[0]?.includes?.('mozPressure') || args[0]?.includes?.('mozInputSource')) {
+    return; // Suprimir warnings específicos
+  }
+  originalWarn.apply(console, args);
+};
 import 'leaflet/dist/leaflet.css';
 
 // Suprimir warnings de APIs obsoletas do Leaflet

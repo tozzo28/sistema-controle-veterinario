@@ -3,6 +3,15 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { MapPin, AlertTriangle, Activity, Shield, RefreshCw } from 'lucide-react';
 import { geocodeWithFallback } from '../services/geocoding';
+
+// Suprimir warnings obsoletos do Mozilla
+const originalWarn = console.warn;
+console.warn = (...args) => {
+  if (args[0]?.includes?.('mozPressure') || args[0]?.includes?.('mozInputSource')) {
+    return; // Suprimir warnings específicos
+  }
+  originalWarn.apply(console, args);
+};
 import 'leaflet/dist/leaflet.css';
 
 // Suprimir warnings de APIs obsoletas do Leaflet
@@ -62,12 +71,10 @@ const PARAGUACU_COORDS: [number, number] = [-22.4114, -50.5739];
         try {
           // Aguardar um pouco para garantir que o mapa esteja totalmente carregado
           setTimeout(() => {
-            if (map && map.getContainer() && !map.getContainer().querySelector('.leaflet-container')) {
-              console.log('Mapa não está pronto, tentando novamente...');
-              return;
+            if (map && map.getContainer()) {
+              map.setView(center, 13);
             }
-            map.setView(center, 13);
-          }, 100);
+          }, 200);
         } catch (error) {
           console.error('Erro ao centralizar mapa:', error);
         }
