@@ -222,15 +222,20 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
               
               <div className="md:col-span-2 lg:col-span-3">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Endereço
+                  Endereço Completo *
                 </label>
                 <textarea
                   name="endereco"
                   value={formData.endereco}
                   onChange={handleChange}
                   rows={2}
+                  placeholder="Ex: Rua das Flores, 123, Centro, Paraguaçu Paulista - SP"
                   className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  required
                 />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  💡 Inclua rua, número, bairro e cidade para localização precisa no mapa
+                </p>
               </div>
             </div>
           </section>
@@ -238,6 +243,9 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
           {/* Georreferenciamento */}
           <section>
             <h4 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">Georreferenciamento</h4>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+              📍 Área e quadra são usadas como fallback se o endereço não for encontrado
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

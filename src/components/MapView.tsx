@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { MapPin, AlertTriangle, Activity, Shield } from 'lucide-react';
+import { geocodeWithFallback } from '../services/geocoding';
 import 'leaflet/dist/leaflet.css';
 
 // Suprimir warnings de APIs obsoletas do Leaflet
@@ -49,45 +50,8 @@ interface MapViewProps {
   leishmaniasisCases: LeishmaniasisCase[];
 }
 
-// Coordenadas aproximadas de Paraguaçu, SP
-const PARAGUACU_COORDS = [-22.4114, -50.5739];
-
-// Função para geocodificar endereços (simulada para Paraguaçu)
-const geocodeAddress = (endereco: string, area: string, quadra: string) => {
-  // Simulação de geocodificação baseada na área e quadra
-  const baseLat = PARAGUACU_COORDS[0];
-  const baseLng = PARAGUACU_COORDS[1];
-  
-  // Variação baseada na área
-  const areaOffsets: { [key: string]: [number, number] } = {
-    'Centro': [0, 0],
-    'Norte': [0.01, 0],
-    'Sul': [-0.01, 0],
-    'Leste': [0, 0.01],
-    'Oeste': [0, -0.01],
-  };
-  
-  // Variação baseada na quadra
-  const quadraOffsets: { [key: string]: [number, number] } = {
-    'A': [0.002, 0.002],
-    'B': [0.002, -0.002],
-    'C': [-0.002, 0.002],
-    'D': [-0.002, -0.002],
-    'E': [0.004, 0],
-  };
-  
-  const areaOffset = areaOffsets[area] || [0, 0];
-  const quadraOffset = quadraOffsets[quadra] || [0, 0];
-  
-  // Adicionar pequena variação aleatória para simular localização específica
-  const randomLat = (Math.random() - 0.5) * 0.005;
-  const randomLng = (Math.random() - 0.5) * 0.005;
-  
-  return [
-    baseLat + areaOffset[0] + quadraOffset[0] + randomLat,
-    baseLng + areaOffset[1] + quadraOffset[1] + randomLng
-  ];
-};
+// Coordenadas de Paraguaçu, SP (fallback)
+const PARAGUACU_COORDS: [number, number] = [-22.4114, -50.5739];
 
 // Componente para centralizar o mapa
 const MapCenter: React.FC<{ center: [number, number] }> = ({ center }) => {
@@ -102,15 +66,36 @@ const MapCenter: React.FC<{ center: [number, number] }> = ({ center }) => {
 
 const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
   const [mapCenter, setMapCenter] = useState<[number, number]>(PARAGUACU_COORDS);
+  const [mapCases, setMapCases] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Processar casos para o mapa
-  const mapCases = leishmaniasisCases.map(case_ => {
-    const coords = geocodeAddress(case_.endereco || '', case_.area, case_.quadra);
-    return {
-      ...case_,
-      coordinates: coords as [number, number]
+  // Processar casos para o mapa com geocodificação real
+  useEffect(() => {
+    const processCases = async () => {
+      setIsLoading(true);
+      const processedCases = await Promise.all(
+        leishmaniasisCases.map(async (case_) => {
+          const geocodingResult = await geocodeWithFallback(
+            case_.endereco || '', 
+            case_.area, 
+            case_.quadra
+          );
+          
+          return {
+            ...case_,
+            coordinates: [geocodingResult.lat, geocodingResult.lng] as [number, number],
+            geocodedAddress: geocodingResult.address,
+            geocodingSuccess: geocodingResult.success
+          };
+        })
+      );
+      
+      setMapCases(processedCases);
+      setIsLoading(false);
     };
-  });
+
+    processCases();
+  }, [leishmaniasisCases]);
 
   // Estatísticas do mapa
   const stats = {
@@ -130,6 +115,21 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
         <p className="text-gray-500 dark:text-gray-400 text-center py-8">
           Nenhum caso registrado para exibir no mapa.
         </p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+          <MapPin className="h-5 w-5 mr-2 text-blue-600" />
+          Mapa de Casos - Paraguaçu/SP
+        </h3>
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span className="ml-3 text-gray-600 dark:text-gray-400">Carregando localizações...</span>
+        </div>
       </div>
     );
   }
@@ -239,31 +239,36 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
                   position={case_.coordinates}
                   icon={customIcon}
                 >
-                  <Popup>
-                    <div className="p-3 max-w-xs sm:max-w-sm">
-                      <h4 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">{case_.nomeAnimal}</h4>
-                      <div className="space-y-2 text-xs sm:text-sm">
-                        <p><strong>Tutor:</strong> {case_.nomeTutor}</p>
-                        <p><strong>Tipo:</strong> {case_.tipoAnimal === 'cao' ? 'Cão' : 'Gato'}</p>
-                        <p><strong>Raça:</strong> {case_.raca || 'Não informado'}</p>
-                        <p><strong>Status:</strong> 
-                          <span className={`ml-1 px-2 py-1 rounded text-xs ${
-                            case_.status === 'positivo' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
-                            case_.status === 'notificado' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                            case_.status === 'tratamento' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                          }`}>
-                            {case_.status === 'positivo' ? 'Positivo' :
-                             case_.status === 'notificado' ? 'Notificado' :
-                             case_.status === 'tratamento' ? 'Em Tratamento' :
-                             case_.status}
-                          </span>
-                        </p>
-                        <p><strong>Área:</strong> {case_.area} - Quadra {case_.quadra}</p>
-                        {case_.endereco && <p><strong>Endereço:</strong> {case_.endereco}</p>}
-                      </div>
-                    </div>
-                  </Popup>
+                        <Popup>
+                          <div className="p-3 max-w-xs sm:max-w-sm">
+                            <h4 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">{case_.nomeAnimal}</h4>
+                            <div className="space-y-2 text-xs sm:text-sm">
+                              <p><strong>Tutor:</strong> {case_.nomeTutor}</p>
+                              <p><strong>Tipo:</strong> {case_.tipoAnimal === 'cao' ? 'Cão' : 'Gato'}</p>
+                              <p><strong>Raça:</strong> {case_.raca || 'Não informado'}</p>
+                              <p><strong>Status:</strong> 
+                                <span className={`ml-1 px-2 py-1 rounded text-xs ${
+                                  case_.status === 'positivo' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                                  case_.status === 'notificado' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                                  case_.status === 'tratamento' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                                  'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                                }`}>
+                                  {case_.status === 'positivo' ? 'Positivo' :
+                                   case_.status === 'notificado' ? 'Notificado' :
+                                   case_.status === 'tratamento' ? 'Em Tratamento' :
+                                   case_.status}
+                                </span>
+                              </p>
+                              <p><strong>Área:</strong> {case_.area} - Quadra {case_.quadra}</p>
+                              <p><strong>Localização:</strong> {case_.geocodedAddress}</p>
+                              {!case_.geocodingSuccess && (
+                                <p className="text-orange-600 text-xs">
+                                  <span className="font-semibold">⚠️</span> Localização aproximada
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </Popup>
                 </Marker>
               );
             })}
