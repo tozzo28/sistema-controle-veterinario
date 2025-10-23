@@ -54,27 +54,62 @@ interface MapViewProps {
 const PARAGUACU_COORDS: [number, number] = [-22.4114, -50.5739];
 
 // Componente para centralizar o mapa
-const MapCenter: React.FC<{ center: [number, number] }> = ({ center }) => {
-  const map = useMap();
-  
-  useEffect(() => {
-    if (map && center && center.length === 2 && !isNaN(center[0]) && !isNaN(center[1])) {
-      try {
-        map.setView(center, 13);
-      } catch (error) {
-        console.error('Erro ao centralizar mapa:', error);
+  const MapCenter: React.FC<{ center: [number, number] }> = ({ center }) => {
+    const map = useMap();
+    
+    useEffect(() => {
+      if (map && center && center.length === 2 && !isNaN(center[0]) && !isNaN(center[1])) {
+        try {
+          // Aguardar um pouco para garantir que o mapa esteja totalmente carregado
+          setTimeout(() => {
+            if (map && map.getContainer() && !map.getContainer().querySelector('.leaflet-container')) {
+              console.log('Mapa não está pronto, tentando novamente...');
+              return;
+            }
+            map.setView(center, 13);
+          }, 100);
+        } catch (error) {
+          console.error('Erro ao centralizar mapa:', error);
+        }
       }
-    }
-  }, [map, center]);
-  
-  return null;
-};
+    }, [map, center]);
+    
+    return null;
+  };
 
 const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
   const [mapCenter, setMapCenter] = useState<[number, number]>(PARAGUACU_COORDS);
   const [mapCases, setMapCases] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Configurar ícones personalizados para evitar OpaqueResponseBlocking
+  useEffect(() => {
+    const createCustomIcon = (color: string) => {
+      return L.divIcon({
+        className: 'custom-div-icon',
+        html: `<div style="
+          background-color: ${color};
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          border: 2px solid white;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        "></div>`,
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+      });
+    };
+    
+    // Armazenar ícones personalizados
+    (window as any).customIcons = {
+      red: createCustomIcon('#ef4444'),
+      orange: createCustomIcon('#f97316'),
+      green: createCustomIcon('#22c55e'),
+      blue: createCustomIcon('#3b82f6'),
+      purple: createCustomIcon('#a855f7')
+    };
+  }, []);
 
   // Função para processar casos
   const processCases = async () => {
