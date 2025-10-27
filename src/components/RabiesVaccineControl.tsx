@@ -19,10 +19,20 @@ const RabiesVaccineControl: React.FC = () => {
 
   useEffect(() => {
     // Carregar registros de vacinação para o mapa
-    fetch('/.netlify/functions/api-rabies-list')
-      .then(r => r.json())
-      .then(setVaccinationRecords)
-      .catch(() => setVaccinationRecords([]));
+    console.log('🔄 Carregando registros de vacinação...');
+    fetch('/.netlify/functions/api-rabies-simple')
+      .then(r => {
+        console.log('📡 Status da resposta:', r.status);
+        return r.json();
+      })
+      .then(data => {
+        console.log('📊 Dados recebidos:', data);
+        setVaccinationRecords(data);
+      })
+      .catch(error => {
+        console.error('❌ Erro ao carregar vacinações:', error);
+        setVaccinationRecords([]);
+      });
   }, []);
 
   return (
