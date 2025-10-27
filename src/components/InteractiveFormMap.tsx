@@ -5,13 +5,39 @@ import { MapPin, Target, RefreshCw, CheckCircle } from 'lucide-react';
 import { geocodeAddress } from '../services/geocoding';
 import 'leaflet/dist/leaflet.css';
 
-// Fix para ícones do Leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-});
+// Fix para ícones do Leaflet - Desabilitar ícones padrão e usar CSS
+L.Icon.Default.prototype.options.iconUrl = '';
+L.Icon.Default.prototype.options.iconRetinaUrl = '';
+L.Icon.Default.prototype.options.shadowUrl = '';
+
+// Criar ícone customizado usando DivIcon (CSS puro)
+const createCustomIcon = (isManual: boolean = false) => {
+  return L.divIcon({
+    className: 'custom-marker',
+    html: `<div style="
+      width: 25px;
+      height: 25px;
+      background-color: ${isManual ? '#3b82f6' : '#ef4444'};
+      border: 3px solid white;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    ">
+      <div style="
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+        transform: rotate(45deg);
+      ">${isManual ? '🎯' : '📍'}</div>
+    </div>`,
+    iconSize: [25, 25],
+    iconAnchor: [12, 25],
+    popupAnchor: [0, -25]
+  });
+};
 
 interface InteractiveFormMapProps {
   address: string;
@@ -165,12 +191,32 @@ const InteractiveFormMap: React.FC<InteractiveFormMapProps> = ({
       </div>
 
       {/* Status da Geocodificação */}
-      {geocodingResult && (
-        <div className="flex items-center space-x-2 p-2 bg-green-50 dark:bg-green-900/20 rounded border border-green-200 dark:border-green-800">
-          <CheckCircle className="w-4 h-4 text-green-500" />
-          <div className="text-xs text-green-700 dark:text-green-300">
-            <span className="font-medium">Encontrado:</span> {geocodingResult.source} 
-            ({Math.round((geocodingResult.confidence || 0) * 100)}% confiança)
+      {geocodingResult && !isManualPosition && (
+        <div className={`flex items-center space-x-2 p-2 rounded border ${
+          (geocodingResult.confidence || 0) >= 0.8 
+            ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+            : (geocodingResult.confidence || 0) >= 0.5
+            ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+            : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
+        }`}>
+          <CheckCircle className={`w-4 h-4 ${
+            (geocodingResult.confidence || 0) >= 0.8 
+              ? 'text-green-500'
+              : (geocodingResult.confidence || 0) >= 0.5
+              ? 'text-blue-500'
+              : 'text-yellow-500'
+          }`} />
+          <div className={`text-xs ${
+            (geocodingResult.confidence || 0) >= 0.8 
+              ? 'text-green-700 dark:text-green-300'
+              : (geocodingResult.confidence || 0) >= 0.5
+              ? 'text-blue-700 dark:text-blue-300'
+              : 'text-yellow-700 dark:text-yellow-300'
+          }`}>
+            <span className="font-medium">
+              {(geocodingResult.confidence || 0) >= 0.8 ? '✅ Alta Precisão' : 
+               (geocodingResult.confidence || 0) >= 0.5 ? '📍 Boa Precisão' : '⚠️ Precisão Média'}:
+            </span> {geocodingResult.source} ({Math.round((geocodingResult.confidence || 0) * 100)}%)
           </div>
         </div>
       )}
@@ -203,19 +249,29 @@ const InteractiveFormMap: React.FC<InteractiveFormMapProps> = ({
           
           {/* Marcador da posição */}
           {markerPosition && (
-            <Marker position={markerPosition}>
+            <Marker 
+              position={markerPosition}
+              icon={createCustomIcon(isManualPosition)}
+            >
               <Popup>
                 <div className="text-sm">
                   <p className="font-medium">
-                    {isManualPosition ? '🎯 Posição Manual' : '📍 Posição Geocodificada'}
+                    {isManualPosition ? '🎯 Posição Manual (100% Precisa)' : '📍 Posição Geocodificada'}
                   </p>
                   <p className="text-xs text-gray-600 mt-1">
+                    <strong>Coordenadas:</strong><br />
                     Lat: {markerPosition[0].toFixed(6)}<br />
                     Lng: {markerPosition[1].toFixed(6)}
                   </p>
                   {geocodingResult && !isManualPosition && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      Fonte: {geocodingResult.source}
+                    <div className="text-xs text-gray-500 mt-2">
+                      <p><strong>Fonte:</strong> {geocodingResult.source}</p>
+                      <p><strong>Confiança:</strong> {Math.round((geocodingResult.confidence || 0) * 100)}%</p>
+                    </div>
+                  )}
+                  {isManualPosition && (
+                    <p className="text-xs text-blue-600 mt-2">
+                      <strong>✅ Posição ajustada manualmente</strong>
                     </p>
                   )}
                 </div>
