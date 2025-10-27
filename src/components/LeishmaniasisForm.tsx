@@ -374,9 +374,24 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                           <p className="text-xs text-red-700 dark:text-red-300 mt-1">
                             {geocodingState.error}
                           </p>
-                          <p className="text-xs text-red-700 dark:text-red-300 mt-2">
-                            💡 Dica: Tente incluir mais detalhes como número, bairro ou CEP
-                          </p>
+                          
+                          {/* Dicas Específicas */}
+                          <div className="mt-3 space-y-2">
+                            <p className="text-xs font-medium text-red-700 dark:text-red-300">
+                              💡 Dicas para melhorar a localização:
+                            </p>
+                            <ul className="text-xs text-red-600 dark:text-red-400 space-y-1 ml-4">
+                              <li>• Use CEPs específicos (não terminados em 000)</li>
+                              <li>• Inclua o número da casa/estabelecimento</li>
+                              <li>• Adicione o bairro correto</li>
+                              <li>• Exemplos que funcionam:</li>
+                            </ul>
+                            <div className="bg-red-100 dark:bg-red-800/30 p-2 rounded text-xs text-red-700 dark:text-red-300 mt-2">
+                              <p>✅ "Av. Galdino, 1100 - Vila Galdino, Paraguaçu Paulista - SP, 19700-070"</p>
+                              <p>✅ "Rua das Flores, 123 - Centro, Paraguaçu Paulista - SP"</p>
+                              <p>❌ "Av. Brasil, 951 - Centro, Paraguaçu Paulista - SP, 19700-000"</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>

@@ -225,6 +225,20 @@ const geocodeWithViaCEP = async (address: string): Promise<GeocodingResult> => {
     const cep = cepMatch[0].replace('-', '');
     console.log('🔍 [ViaCEP] CEP encontrado:', cep);
     
+    // Verificar se é um CEP genérico (terminado em 000)
+    if (cep.endsWith('000')) {
+      console.log('⚠️ [ViaCEP] CEP genérico detectado, pulando ViaCEP');
+      return {
+        lat: 0,
+        lng: 0,
+        address: '',
+        success: false,
+        error: 'CEP genérico (terminado em 000)',
+        source: 'ViaCEP',
+        confidence: 0
+      };
+    }
+    
     const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
@@ -275,6 +289,149 @@ const geocodeWithViaCEP = async (address: string): Promise<GeocodingResult> => {
   }
 };
 
+// Função para geocodificar usando Photon (OpenStreetMap alternativo)
+const geocodeWithPhoton = async (address: string): Promise<GeocodingResult> => {
+  try {
+    console.log('🔍 [Photon] Geocodificando:', address);
+
+    // Limpar e normalizar endereço
+    const cleanAddress = address.trim().replace(/\s+/g, ' ');
+    
+    // URL da API Photon (Komoot)
+    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(cleanAddress)}&limit=5&lang=pt&bbox=-50.65,-22.50,-50.50,-22.35`;
+    
+    console.log('🌐 [Photon] URL:', url);
+    
+    const response = await fetch(url);
+    console.log('📡 [Photon] Status da resposta:', response.status);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('📊 [Photon] Dados recebidos:', data);
+    
+    if (!data.features || data.features.length === 0) {
+      return {
+        lat: 0,
+        lng: 0,
+        address: '',
+        success: false,
+        error: 'Nenhum resultado encontrado',
+        source: 'Photon',
+        confidence: 0
+      };
+    }
+    
+    // Filtrar resultados para Paraguaçu Paulista
+    const paraguacuResults = data.features.filter((feature: any) => {
+      const props = feature.properties;
+      return props.city?.toLowerCase().includes('paraguaçu') || 
+             props.name?.toLowerCase().includes('paraguaçu') ||
+             props.state?.toLowerCase().includes('são paulo') ||
+             props.state?.toLowerCase().includes('sp');
+    });
+    
+    const bestResult = paraguacuResults.length > 0 ? paraguacuResults[0] : data.features[0];
+    const coords = bestResult.geometry.coordinates; // [lng, lat] no GeoJSON
+    
+    console.log('✅ [Photon] Resultado encontrado:', {
+      lat: coords[1],
+      lng: coords[0],
+      properties: bestResult.properties
+    });
+    
+    return {
+      lat: coords[1],
+      lng: coords[0],
+      address: bestResult.properties.name || bestResult.properties.street || address,
+      success: true,
+      source: 'Photon (Komoot)',
+      confidence: paraguacuResults.length > 0 ? 0.7 : 0.4
+    };
+    
+  } catch (error) {
+    console.error('❌ [Photon] Erro:', error);
+    return {
+      lat: 0,
+      lng: 0,
+      address: '',
+      success: false,
+      error: `Photon: ${error}`,
+      source: 'Photon',
+      confidence: 0
+    };
+  }
+};
+
+// Função para geocodificar usando LocationIQ (alternativa gratuita)
+const geocodeWithLocationIQ = async (address: string): Promise<GeocodingResult> => {
+  try {
+    console.log('🔍 [LocationIQ] Geocodificando:', address);
+
+    // Limpar e normalizar endereço
+    const cleanAddress = address.trim().replace(/\s+/g, ' ');
+    
+    // URL da API LocationIQ (sem chave, limitada)
+    const url = `https://us1.locationiq.com/v1/search.php?key=demo&q=${encodeURIComponent(cleanAddress)}&format=json&limit=5&countrycodes=br&addressdetails=1&bounded=1&viewbox=-50.65,-22.35,-50.50,-22.50`;
+    
+    console.log('🌐 [LocationIQ] URL:', url);
+    
+    const response = await fetch(url);
+    console.log('📡 [LocationIQ] Status da resposta:', response.status);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('📊 [LocationIQ] Dados recebidos:', data);
+    
+    if (!data || data.length === 0) {
+      return {
+        lat: 0,
+        lng: 0,
+        address: '',
+        success: false,
+        error: 'Nenhum resultado encontrado',
+        source: 'LocationIQ',
+        confidence: 0
+      };
+    }
+    
+    // Encontrar melhor resultado
+    const bestResult = data[0];
+    
+    console.log('✅ [LocationIQ] Resultado encontrado:', {
+      lat: bestResult.lat,
+      lng: bestResult.lon,
+      display_name: bestResult.display_name
+    });
+    
+    return {
+      lat: parseFloat(bestResult.lat),
+      lng: parseFloat(bestResult.lon),
+      address: bestResult.display_name,
+      success: true,
+      source: 'LocationIQ',
+      confidence: 0.6
+    };
+    
+  } catch (error) {
+    console.error('❌ [LocationIQ] Erro:', error);
+    return {
+      lat: 0,
+      lng: 0,
+      address: '',
+      success: false,
+      error: `LocationIQ: ${error}`,
+      source: 'LocationIQ',
+      confidence: 0
+    };
+  }
+};
+
 // Função principal de geocodificação com múltiplas APIs
 export const geocodeAddress = async (address: string): Promise<GeocodingResult> => {
   try {
@@ -293,24 +450,41 @@ export const geocodeAddress = async (address: string): Promise<GeocodingResult> 
 
     console.log('🎯 [GEOCODING] Iniciando geocodificação:', address);
 
-    // Tentar Nominatim primeiro (mais preciso para endereços específicos)
-    const nominatimResult = await geocodeWithNominatim(address);
-    if (nominatimResult.success && nominatimResult.confidence && nominatimResult.confidence > 0.5) {
-      console.log('✅ [GEOCODING] Nominatim bem-sucedido com alta confiança');
-      return nominatimResult;
+    // Array de APIs para tentar em ordem de prioridade
+    const geocodingAPIs = [
+      { name: 'Nominatim', func: geocodeWithNominatim, minConfidence: 0.5 },
+      { name: 'Photon', func: geocodeWithPhoton, minConfidence: 0.4 },
+      { name: 'LocationIQ', func: geocodeWithLocationIQ, minConfidence: 0.4 },
+      { name: 'ViaCEP', func: geocodeWithViaCEP, minConfidence: 0.3 }
+    ];
+
+    let bestResult: GeocodingResult | null = null;
+
+    // Tentar cada API em ordem
+    for (const api of geocodingAPIs) {
+      console.log(`🔄 [GEOCODING] Tentando ${api.name}...`);
+      
+      try {
+        const result = await api.func(address);
+        
+        if (result.success && result.confidence && result.confidence >= api.minConfidence) {
+          console.log(`✅ [GEOCODING] ${api.name} bem-sucedido com confiança ${Math.round(result.confidence * 100)}%`);
+          return result;
+        } else if (result.success && (!bestResult || (result.confidence || 0) > (bestResult.confidence || 0))) {
+          // Guardar o melhor resultado mesmo se não atingir a confiança mínima
+          bestResult = result;
+          console.log(`⚠️ [GEOCODING] ${api.name} com baixa confiança, guardando como backup`);
+        }
+      } catch (error) {
+        console.log(`❌ [GEOCODING] ${api.name} falhou:`, error);
+        continue;
+      }
     }
 
-    // Se Nominatim falhou ou tem baixa confiança, tentar ViaCEP
-    const viacepResult = await geocodeWithViaCEP(address);
-    if (viacepResult.success) {
-      console.log('✅ [GEOCODING] ViaCEP bem-sucedido');
-      return viacepResult;
-    }
-
-    // Se ambos falharam, usar o resultado do Nominatim mesmo com baixa confiança
-    if (nominatimResult.success) {
-      console.log('⚠️ [GEOCODING] Usando Nominatim com baixa confiança');
-      return nominatimResult;
+    // Se temos um resultado backup, usar ele
+    if (bestResult) {
+      console.log(`⚠️ [GEOCODING] Usando melhor resultado disponível (${bestResult.source})`);
+      return bestResult;
     }
 
     // Se tudo falhou, retornar erro
