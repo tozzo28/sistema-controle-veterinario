@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, MapPin, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { geocodeAddress } from '../services/geocoding';
 import PreciseLocationGuide from './PreciseLocationGuide';
+import InteractiveFormMap from './InteractiveFormMap';
 
 interface LeishmaniasisFormProps {
   onClose: () => void;
@@ -45,6 +46,34 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
     error: null as string | null,
     tested: false
   });
+
+  // Função para lidar com mudanças de coordenadas do mapa
+  const handleMapCoordinatesChange = (lat: number, lng: number, address: string, isManual: boolean) => {
+    console.log('🗺️ [FORMULÁRIO] Coordenadas atualizadas pelo mapa:', { lat, lng, address, isManual });
+    
+    setFormData(prev => ({
+      ...prev,
+      latitude: lat,
+      longitude: lng
+    }));
+
+    // Se foi posição manual, atualizar o estado de geocodificação
+    if (isManual) {
+      setGeocodingState({
+        isLoading: false,
+        result: {
+          lat,
+          lng,
+          address,
+          success: true,
+          source: 'Posição Manual no Mapa',
+          confidence: 1.0
+        },
+        error: null,
+        tested: true
+      });
+    }
+  };
 
   // Função para testar geocodificação
   const testGeocode = async () => {
@@ -404,6 +433,18 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   💡 Inclua rua, número, bairro e cidade para localização precisa no mapa
                 </p>
+                
+                {/* Mapa Interativo */}
+                {formData.endereco && formData.endereco.trim().length > 10 && (
+                  <div className="mt-4">
+                    <InteractiveFormMap
+                      address={formData.endereco}
+                      onCoordinatesChange={handleMapCoordinatesChange}
+                      initialLat={formData.latitude as number}
+                      initialLng={formData.longitude as number}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </section>
