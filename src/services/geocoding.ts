@@ -365,68 +365,149 @@ const geocodeWithPhoton = async (address: string): Promise<GeocodingResult> => {
   }
 };
 
-// Função para geocodificar usando LocationIQ (alternativa gratuita)
-const geocodeWithLocationIQ = async (address: string): Promise<GeocodingResult> => {
+// Função para geocodificar usando Google Maps (sem chave - limitado mas mais preciso)
+const geocodeWithGoogleMaps = async (address: string): Promise<GeocodingResult> => {
   try {
-    console.log('🔍 [LocationIQ] Geocodificando:', address);
+    console.log('🔍 [Google Maps] Geocodificando:', address);
 
     // Limpar e normalizar endereço
     const cleanAddress = address.trim().replace(/\s+/g, ' ');
     
-    // URL da API LocationIQ (sem chave, limitada)
-    const url = `https://us1.locationiq.com/v1/search.php?key=demo&q=${encodeURIComponent(cleanAddress)}&format=json&limit=5&countrycodes=br&addressdetails=1&bounded=1&viewbox=-50.65,-22.35,-50.50,-22.50`;
+    // URL da API do Google Maps (sem chave, limitada mas funcional)
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(cleanAddress)}&region=br&bounds=-22.50,-50.65|-22.35,-50.50`;
     
-    console.log('🌐 [LocationIQ] URL:', url);
+    console.log('🌐 [Google Maps] URL:', url);
     
     const response = await fetch(url);
-    console.log('📡 [LocationIQ] Status da resposta:', response.status);
+    console.log('📡 [Google Maps] Status da resposta:', response.status);
     
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
     
     const data = await response.json();
-    console.log('📊 [LocationIQ] Dados recebidos:', data);
+    console.log('📊 [Google Maps] Dados recebidos:', data);
     
-    if (!data || data.length === 0) {
+    if (!data.results || data.results.length === 0) {
       return {
         lat: 0,
         lng: 0,
         address: '',
         success: false,
         error: 'Nenhum resultado encontrado',
-        source: 'LocationIQ',
+        source: 'Google Maps',
         confidence: 0
       };
     }
     
     // Encontrar melhor resultado
-    const bestResult = data[0];
+    const bestResult = data.results[0];
+    const location = bestResult.geometry.location;
     
-    console.log('✅ [LocationIQ] Resultado encontrado:', {
-      lat: bestResult.lat,
-      lng: bestResult.lon,
-      display_name: bestResult.display_name
+    console.log('✅ [Google Maps] Resultado encontrado:', {
+      lat: location.lat,
+      lng: location.lng,
+      formatted_address: bestResult.formatted_address,
+      types: bestResult.types
     });
     
+    // Calcular confiança baseada no tipo de resultado
+    let confidence = 0.5;
+    if (bestResult.types.includes('street_address')) {
+      confidence = 0.9;
+    } else if (bestResult.types.includes('route')) {
+      confidence = 0.7;
+    } else if (bestResult.types.includes('neighborhood')) {
+      confidence = 0.6;
+    }
+    
     return {
-      lat: parseFloat(bestResult.lat),
-      lng: parseFloat(bestResult.lon),
-      address: bestResult.display_name,
+      lat: location.lat,
+      lng: location.lng,
+      address: bestResult.formatted_address,
       success: true,
-      source: 'LocationIQ',
-      confidence: 0.6
+      source: 'Google Maps',
+      confidence: confidence
     };
     
   } catch (error) {
-    console.error('❌ [LocationIQ] Erro:', error);
+    console.error('❌ [Google Maps] Erro:', error);
     return {
       lat: 0,
       lng: 0,
       address: '',
       success: false,
-      error: `LocationIQ: ${error}`,
-      source: 'LocationIQ',
+      error: `Google Maps: ${error}`,
+      source: 'Google Maps',
+      confidence: 0
+    };
+  }
+};
+
+// Função para geocodificar usando OpenCage (API gratuita com limite)
+const geocodeWithOpenCage = async (address: string): Promise<GeocodingResult> => {
+  try {
+    console.log('🔍 [OpenCage] Geocodificando:', address);
+
+    // Limpar e normalizar endereço
+    const cleanAddress = address.trim().replace(/\s+/g, ' ');
+    
+    // URL da API OpenCage (sem chave, limitada)
+    const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(cleanAddress)}&countrycode=br&bounds=-22.50,-50.65,-22.35,-50.50&limit=5&no_annotations=1`;
+    
+    console.log('🌐 [OpenCage] URL:', url);
+    
+    const response = await fetch(url);
+    console.log('📡 [OpenCage] Status da resposta:', response.status);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('📊 [OpenCage] Dados recebidos:', data);
+    
+    if (!data.results || data.results.length === 0) {
+      return {
+        lat: 0,
+        lng: 0,
+        address: '',
+        success: false,
+        error: 'Nenhum resultado encontrado',
+        source: 'OpenCage',
+        confidence: 0
+      };
+    }
+    
+    // Encontrar melhor resultado
+    const bestResult = data.results[0];
+    const geometry = bestResult.geometry;
+    
+    console.log('✅ [OpenCage] Resultado encontrado:', {
+      lat: geometry.lat,
+      lng: geometry.lng,
+      formatted: bestResult.formatted,
+      confidence: bestResult.confidence
+    });
+    
+    return {
+      lat: geometry.lat,
+      lng: geometry.lng,
+      address: bestResult.formatted,
+      success: true,
+      source: 'OpenCage',
+      confidence: bestResult.confidence / 10 // OpenCage usa escala 0-10
+    };
+    
+  } catch (error) {
+    console.error('❌ [OpenCage] Erro:', error);
+    return {
+      lat: 0,
+      lng: 0,
+      address: '',
+      success: false,
+      error: `OpenCage: ${error}`,
+      source: 'OpenCage',
       confidence: 0
     };
   }
@@ -570,13 +651,14 @@ export const geocodeAddress = async (address: string): Promise<GeocodingResult> 
 
     console.log('🎯 [GEOCODING] Iniciando geocodificação:', address);
 
-    // Array de APIs para tentar em ordem de prioridade
+    // Array de APIs para tentar em ordem de prioridade (mais precisas primeiro)
     const geocodingAPIs = [
+      { name: 'Google Maps', func: geocodeWithGoogleMaps, minConfidence: 0.7 },
+      { name: 'OpenCage', func: geocodeWithOpenCage, minConfidence: 0.6 },
       { name: 'Nominatim', func: geocodeWithNominatim, minConfidence: 0.5 },
       { name: 'Photon', func: geocodeWithPhoton, minConfidence: 0.4 },
-      { name: 'LocationIQ', func: geocodeWithLocationIQ, minConfidence: 0.4 },
       { name: 'ViaCEP', func: geocodeWithViaCEP, minConfidence: 0.3 },
-      { name: 'Conhecimento Local', func: geocodeWithLocalKnowledge, minConfidence: 0.3 }
+      { name: 'Conhecimento Local', func: geocodeWithLocalKnowledge, minConfidence: 0.2 }
     ];
 
     let bestResult: GeocodingResult | null = null;
