@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MapPin, CheckCircle, AlertCircle, Loader2, Target } from 'lucide-react';
-import { geocodeAddress } from '../services/geocoding';
+import { geocodeAddress, geocodeWithManualCoordinates } from '../services/geocoding';
+import PrecisionIndicator from './PrecisionIndicator';
 
 const GoogleMapsTest: React.FC = () => {
   const [testAddress, setTestAddress] = useState('Av. Brasil, 951 - Centro, Paraguaçu Paulista - SP');
@@ -41,6 +42,34 @@ const GoogleMapsTest: React.FC = () => {
     } catch (error) {
       setError(`Erro: ${error}`);
       console.error('❌ [TESTE] Erro geral:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const testManualCoordinates = async () => {
+    setIsLoading(true);
+    setResult(null);
+    setError(null);
+
+    try {
+      console.log('🎯 [TESTE] Testando coordenadas manuais 100% precisas');
+      
+      // Coordenadas exatas do centro de Paraguaçu Paulista (exemplo)
+      const latitude = -22.4114567;
+      const longitude = -50.5739123;
+      
+      const geocodingResult = await geocodeWithManualCoordinates(
+        testAddress,
+        latitude,
+        longitude
+      );
+      
+      setResult(geocodingResult);
+      console.log('✅ [TESTE] Resultado 100% preciso:', geocodingResult);
+    } catch (error) {
+      setError(`Erro: ${error}`);
+      console.error('❌ [TESTE] Erro:', error);
     } finally {
       setIsLoading(false);
     }
@@ -99,21 +128,32 @@ const GoogleMapsTest: React.FC = () => {
           />
         </div>
 
-        {/* Botão de Teste */}
-        <button
-          onClick={testGeocode}
-          disabled={isLoading || !testAddress.trim()}
-          className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {isLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <MapPin className="w-4 h-4" />
-          )}
-          <span>
-            {isLoading ? 'Testando Geocodificação...' : 'Testar com Google Maps'}
-          </span>
-        </button>
+        {/* Botões de Teste */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={testGeocode}
+            disabled={isLoading || !testAddress.trim()}
+            className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <MapPin className="w-4 h-4" />
+            )}
+            <span>
+              {isLoading ? 'Testando Geocodificação...' : 'Testar com APIs'}
+            </span>
+          </button>
+          
+          <button
+            onClick={() => testManualCoordinates()}
+            disabled={isLoading}
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <Target className="w-4 h-4" />
+            <span>Testar 100% Preciso</span>
+          </button>
+        </div>
       </div>
 
       {/* Resultado do Teste */}
@@ -125,7 +165,15 @@ const GoogleMapsTest: React.FC = () => {
               <p className="text-sm font-medium text-green-800 dark:text-green-200">
                 ✅ Geocodificação Bem-Sucedida!
               </p>
-              <div className="mt-2 space-y-1 text-xs text-green-700 dark:text-green-300">
+              <div className="mt-3">
+                <PrecisionIndicator 
+                  confidence={result.confidence}
+                  source={result.source}
+                  isManual={result.source === 'Coordenadas Manuais'}
+                />
+              </div>
+              
+              <div className="mt-3 space-y-1 text-xs text-green-700 dark:text-green-300">
                 <p><strong>📍 Coordenadas:</strong> {result.lat.toFixed(7)}, {result.lng.toFixed(7)}</p>
                 <p><strong>📍 Endereço Encontrado:</strong> {result.address}</p>
                 <p><strong>🔍 Fonte:</strong> {result.source}</p>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { MapPin, AlertTriangle, Activity, Shield, RefreshCw } from 'lucide-react';
-import { geocodeWithFallback } from '../services/geocoding';
+import { geocodeWithFallback, geocodeWithManualCoordinates } from '../services/geocoding';
 
 // Suprimir warnings obsoletos do Mozilla
 const originalWarn = console.warn;
@@ -137,11 +137,24 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
       leishmaniasisCases.map(async (case_, index) => {
         console.log(`📍 Processando caso ${index + 1}:`, case_.nomeAnimal, case_.endereco);
         
-        const geocodingResult = await geocodeWithFallback(
-          case_.endereco || '', 
-          case_.area, 
-          case_.quadra
-        );
+        let geocodingResult;
+        
+        // Verificar se tem coordenadas manuais (100% precisão)
+        if (case_.latitude && case_.longitude && !isNaN(case_.latitude) && !isNaN(case_.longitude)) {
+          console.log(`🎯 Usando coordenadas manuais 100% precisas para ${case_.nomeAnimal}:`, { lat: case_.latitude, lng: case_.longitude });
+          geocodingResult = await geocodeWithManualCoordinates(
+            case_.endereco || 'Endereço com coordenadas manuais',
+            case_.latitude,
+            case_.longitude
+          );
+        } else {
+          // Usar geocodificação automática
+          geocodingResult = await geocodeWithFallback(
+            case_.endereco || '', 
+            case_.area, 
+            case_.quadra
+          );
+        }
         
         console.log(`✅ Resultado geocodificação para ${case_.nomeAnimal}:`, geocodingResult);
         

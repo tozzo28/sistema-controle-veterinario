@@ -633,6 +633,24 @@ const geocodeWithLocalKnowledge = async (address: string): Promise<GeocodingResu
   }
 };
 
+// Função para geocodificação com coordenadas manuais (100% precisão)
+export const geocodeWithManualCoordinates = async (
+  address: string, 
+  latitude: number, 
+  longitude: number
+): Promise<GeocodingResult> => {
+  console.log('🎯 [MANUAL] Usando coordenadas manuais 100% precisas:', { lat: latitude, lng: longitude });
+  
+  return {
+    lat: latitude,
+    lng: longitude,
+    address: `${address} (Coordenadas Manuais - 100% Precisas)`,
+    success: true,
+    source: 'Coordenadas Manuais',
+    confidence: 1.0 // 100% de confiança
+  };
+};
+
 // Função principal de geocodificação com múltiplas APIs
 export const geocodeAddress = async (address: string): Promise<GeocodingResult> => {
   try {
@@ -653,12 +671,12 @@ export const geocodeAddress = async (address: string): Promise<GeocodingResult> 
 
     // Array de APIs para tentar em ordem de prioridade (mais precisas primeiro)
     const geocodingAPIs = [
-      { name: 'Google Maps', func: geocodeWithGoogleMaps, minConfidence: 0.7 },
-      { name: 'OpenCage', func: geocodeWithOpenCage, minConfidence: 0.6 },
-      { name: 'Nominatim', func: geocodeWithNominatim, minConfidence: 0.5 },
-      { name: 'Photon', func: geocodeWithPhoton, minConfidence: 0.4 },
-      { name: 'ViaCEP', func: geocodeWithViaCEP, minConfidence: 0.3 },
-      { name: 'Conhecimento Local', func: geocodeWithLocalKnowledge, minConfidence: 0.2 }
+      { name: 'Google Maps', func: geocodeWithGoogleMaps, minConfidence: 0.8 },
+      { name: 'OpenCage', func: geocodeWithOpenCage, minConfidence: 0.7 },
+      { name: 'Nominatim', func: geocodeWithNominatim, minConfidence: 0.6 },
+      { name: 'Photon', func: geocodeWithPhoton, minConfidence: 0.5 },
+      { name: 'ViaCEP', func: geocodeWithViaCEP, minConfidence: 0.4 },
+      { name: 'Conhecimento Local', func: geocodeWithLocalKnowledge, minConfidence: 0.3 }
     ];
 
     let bestResult: GeocodingResult | null = null;
