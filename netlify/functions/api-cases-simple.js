@@ -35,13 +35,16 @@ exports.handler = async (event, context) => {
       const data = JSON.parse(event.body);
       const result = await client.query(`
         INSERT INTO leishmaniasis_cases 
-        ("nomeAnimal", "tipoAnimal", "idade", "raca", "sexo", "pelagem", "corPelagem", "nomeTutor", "status", "area", "quadra", "cpf", "telefone", "endereco", "dataNotificacao")
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+        ("nomeAnimal", "tipoAnimal", "idade", "raca", "sexo", "pelagem", "corPelagem", "nomeTutor", "status", "area", "quadra", "cpf", "telefone", "endereco", "latitude", "longitude", "dataNotificacao")
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
         RETURNING *
       `, [
         data.nomeAnimal, data.tipoAnimal, data.idade, data.raca, data.sexo,
         data.pelagem, data.corPelagem, data.nomeTutor, data.status, data.area,
-        data.quadra, data.cpf, data.telefone, data.endereco, new Date()
+        data.quadra, data.cpf, data.telefone, data.endereco, 
+        data.latitude ? parseFloat(data.latitude) : null, 
+        data.longitude ? parseFloat(data.longitude) : null,
+        new Date()
       ]);
       
       return {
@@ -60,14 +63,17 @@ exports.handler = async (event, context) => {
         SET "nomeAnimal" = $1, "tipoAnimal" = $2, "idade" = $3, "raca" = $4, 
             "sexo" = $5, "pelagem" = $6, "corPelagem" = $7, "nomeTutor" = $8, 
             "status" = $9, "area" = $10, "quadra" = $11, "cpf" = $12, 
-            "telefone" = $13, "endereco" = $14
-        WHERE id = $15
+            "telefone" = $13, "endereco" = $14, "latitude" = $15, "longitude" = $16
+        WHERE id = $17
         RETURNING *
       `, [
         updateData.nomeAnimal, updateData.tipoAnimal, updateData.idade, updateData.raca,
         updateData.sexo, updateData.pelagem, updateData.corPelagem, updateData.nomeTutor,
         updateData.status, updateData.area, updateData.quadra, updateData.cpf,
-        updateData.telefone, updateData.endereco, id
+        updateData.telefone, updateData.endereco, 
+        updateData.latitude ? parseFloat(updateData.latitude) : null,
+        updateData.longitude ? parseFloat(updateData.longitude) : null,
+        id
       ]);
       
       return {

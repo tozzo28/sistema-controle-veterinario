@@ -17,6 +17,8 @@ interface LeishmaniasisCase {
   area: string;
   quadra: string;
   dataNotificacao: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface DashboardProps {

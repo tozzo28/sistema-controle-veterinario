@@ -15,6 +15,8 @@ export type LeishmaniasisCase = {
   cpf?: string;
   telefone?: string;
   endereco?: string;
+  latitude?: number;
+  longitude?: number;
 };
 
 const BASE_URL = import.meta.env.VITE_API_URL || '';

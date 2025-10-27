@@ -23,6 +23,8 @@ interface LeishmaniasisCase {
   cpf?: string;
   telefone?: string;
   endereco?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface LeishmaniasisControlProps {
