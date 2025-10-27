@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, MapPin, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { geocodeAddress } from '../services/geocoding';
 
 interface LeishmaniasisFormProps {
   onClose: () => void;
@@ -30,7 +31,65 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
     
     // Status
     status: initialData?.status || 'notificado',
+    
+    // Coordenadas Manuais
+    latitude: initialData?.latitude || '',
+    longitude: initialData?.longitude || '',
   });
+
+  // Estado para geocodificação em tempo real
+  const [geocodingState, setGeocodingState] = useState({
+    isLoading: false,
+    result: null as any,
+    error: null as string | null,
+    tested: false
+  });
+
+  // Função para testar geocodificação
+  const testGeocode = async () => {
+    if (!formData.endereco.trim()) {
+      alert('Por favor, digite um endereço primeiro.');
+      return;
+    }
+
+    setGeocodingState({ isLoading: true, result: null, error: null, tested: false });
+
+    try {
+      const result = await geocodeAddress(formData.endereco);
+      
+      if (result.success) {
+        setGeocodingState({
+          isLoading: false,
+          result: result,
+          error: null,
+          tested: true
+        });
+
+        // Auto-preencher coordenadas se encontradas
+        if (result.lat && result.lng) {
+          setFormData(prev => ({
+            ...prev,
+            latitude: result.lat,
+            longitude: result.lng
+          }));
+        }
+      } else {
+        setGeocodingState({
+          isLoading: false,
+          result: null,
+          error: result.error || 'Endereço não encontrado',
+          tested: true
+        });
+      }
+    } catch (error) {
+      setGeocodingState({
+        isLoading: false,
+        result: null,
+        error: `Erro: ${error}`,
+        tested: true
+      });
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -224,15 +283,106 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Endereço Completo *
                 </label>
-                <textarea
-                  name="endereco"
-                  value={formData.endereco}
-                  onChange={handleChange}
-                  rows={2}
-                  placeholder="Ex: Rua das Flores, 123, Centro, Paraguaçu Paulista - SP"
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                />
+                <div className="space-y-2">
+                  <textarea
+                    name="endereco"
+                    value={formData.endereco}
+                    onChange={handleChange}
+                    rows={2}
+                    placeholder="Ex: Rua das Flores, 123, Centro, Paraguaçu Paulista - SP"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    required
+                  />
+                  
+                  {/* Botão de Teste de Geocodificação */}
+                  <div className="flex items-center space-x-2">
+                    <button
+                      type="button"
+                      onClick={testGeocode}
+                      disabled={geocodingState.isLoading || !formData.endereco.trim()}
+                      className="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                    >
+                      {geocodingState.isLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <MapPin className="w-4 h-4" />
+                      )}
+                      <span>
+                        {geocodingState.isLoading ? 'Testando...' : 'Testar Localização'}
+                      </span>
+                    </button>
+                    
+                    {/* Status da Geocodificação */}
+                    {geocodingState.tested && (
+                      <div className="flex items-center space-x-1">
+                        {geocodingState.result ? (
+                          <>
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                            <span className="text-sm text-green-600 dark:text-green-400">
+                              Encontrado!
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <AlertCircle className="w-4 h-4 text-red-500" />
+                            <span className="text-sm text-red-600 dark:text-red-400">
+                              Não encontrado
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Resultado da Geocodificação */}
+                  {geocodingState.result && (
+                    <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-md border border-green-200 dark:border-green-800">
+                      <div className="flex items-start space-x-2">
+                        <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                            Localização Encontrada
+                          </p>
+                          <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                            <strong>Endereço:</strong> {geocodingState.result.address}
+                          </p>
+                          <p className="text-xs text-green-700 dark:text-green-300">
+                            <strong>Coordenadas:</strong> {geocodingState.result.lat.toFixed(6)}, {geocodingState.result.lng.toFixed(6)}
+                          </p>
+                          <p className="text-xs text-green-700 dark:text-green-300">
+                            <strong>Fonte:</strong> {geocodingState.result.source}
+                          </p>
+                          {geocodingState.result.confidence && (
+                            <p className="text-xs text-green-700 dark:text-green-300">
+                              <strong>Confiança:</strong> {Math.round(geocodingState.result.confidence * 100)}%
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Erro da Geocodificação */}
+                  {geocodingState.error && (
+                    <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-md border border-red-200 dark:border-red-800">
+                      <div className="flex items-start space-x-2">
+                        <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                            Localização Não Encontrada
+                          </p>
+                          <p className="text-xs text-red-700 dark:text-red-300 mt-1">
+                            {geocodingState.error}
+                          </p>
+                          <p className="text-xs text-red-700 dark:text-red-300 mt-2">
+                            💡 Dica: Tente incluir mais detalhes como número, bairro ou CEP
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   💡 Inclua rua, número, bairro e cidade para localização precisa no mapa
                 </p>

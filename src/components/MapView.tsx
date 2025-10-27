@@ -149,7 +149,9 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
           ...case_,
           coordinates: [geocodingResult.lat, geocodingResult.lng] as [number, number],
           geocodedAddress: geocodingResult.address,
-          geocodingSuccess: geocodingResult.success
+          geocodingSuccess: geocodingResult.success,
+          geocodingSource: geocodingResult.source,
+          geocodingConfidence: geocodingResult.confidence
         };
       })
     );
@@ -366,6 +368,16 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
                               </p>
                               <p><strong>Área:</strong> {case_.area} - Quadra {case_.quadra}</p>
                               <p><strong>Localização:</strong> {case_.geocodedAddress}</p>
+                              {case_.geocodingSource && (
+                                <p className="text-xs text-gray-600 dark:text-gray-400">
+                                  <strong>Fonte:</strong> {case_.geocodingSource}
+                                </p>
+                              )}
+                              {case_.geocodingConfidence && (
+                                <p className="text-xs text-gray-600 dark:text-gray-400">
+                                  <strong>Confiança:</strong> {Math.round(case_.geocodingConfidence * 100)}%
+                                </p>
+                              )}
                               {!case_.geocodingSuccess && (
                                 <p className="text-orange-600 text-xs">
                                   <span className="font-semibold">⚠️</span> Localização aproximada
