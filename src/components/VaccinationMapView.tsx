@@ -92,6 +92,7 @@ const MapCenter: React.FC<{ center: [number, number] }> = ({ center }) => {
 };
 
 const VaccinationMapView: React.FC<VaccinationMapViewProps> = ({ vaccinationRecords }) => {
+  console.log('🗺️ [VaccinationMapView] Recebidos registros:', vaccinationRecords);
   const [mapCenter, setMapCenter] = useState<[number, number]>(PARAGUACU_COORDS);
   const [mapRecords, setMapRecords] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
