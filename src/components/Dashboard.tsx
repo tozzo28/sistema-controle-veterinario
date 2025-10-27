@@ -3,6 +3,7 @@ import { AlertTriangle, Syringe, Activity, Shield } from 'lucide-react';
 import StatCard from './StatCard';
 import MapView from './MapView';
 import GeocodingTest from './GeocodingTest';
+import GoogleMapsTest from './GoogleMapsTest';
 
 interface LeishmaniasisCase {
   id: number;
@@ -484,7 +485,11 @@ const Dashboard: React.FC<DashboardProps> = ({ leishmaniasisCases = [] }) => {
 
       {/* Teste de Geocodificação */}
       <section>
-        <GeocodingTest />
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">Teste de Geocodificação</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <GeocodingTest />
+          <GoogleMapsTest />
+        </div>
       </section>
     </div>
   );

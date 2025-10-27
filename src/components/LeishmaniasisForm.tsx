@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, MapPin, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { geocodeAddress } from '../services/geocoding';
+import PreciseLocationGuide from './PreciseLocationGuide';
 
 interface LeishmaniasisFormProps {
   onClose: () => void;
@@ -444,6 +445,51 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                 />
               </div>
             </div>
+          </section>
+
+          {/* Coordenadas Precisas */}
+          <section>
+            <h4 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">Coordenadas Precisas (Opcional)</h4>
+            
+            {/* Guia de Localização Precisa */}
+            <div className="mb-4">
+              <PreciseLocationGuide />
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Latitude
+                </label>
+                <input
+                  type="number"
+                  name="latitude"
+                  value={formData.latitude}
+                  onChange={handleChange}
+                  placeholder="-22.4114567"
+                  step="any"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Longitude
+                </label>
+                <input
+                  type="number"
+                  name="longitude"
+                  value={formData.longitude}
+                  onChange={handleChange}
+                  placeholder="-50.5739123"
+                  step="any"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-3 sm:py-2 text-base sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+            
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              💡 Se fornecidas, essas coordenadas serão usadas no lugar da geocodificação automática
+            </p>
           </section>
 
           {/* Status */}
