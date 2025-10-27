@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { MapPin, Shield, Calendar, User, RefreshCw } from 'lucide-react';
-import { geocodeWithFallback } from '../services/geocoding';
+import { geocodeWithFallback, geocodeWithManualCoordinates } from '../services/geocoding';
 
 // Suprimir warnings obsoletos do Mozilla
 const originalWarn = console.warn;
@@ -52,6 +52,8 @@ interface RabiesVaccineRecord {
   loteVacina: string;
   dosePerdida: boolean;
   endereco?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface VaccinationMapViewProps {
@@ -136,11 +138,24 @@ const VaccinationMapView: React.FC<VaccinationMapViewProps> = ({ vaccinationReco
       vaccinationRecords.map(async (record, index) => {
         console.log(`📍 Processando registro ${index + 1}:`, record.nomeAnimal, record.endereco);
         
-        const geocodingResult = await geocodeWithFallback(
-          record.endereco || '', 
-          record.area, 
-          record.quadra
-        );
+        let geocodingResult;
+        
+        // Verificar se tem coordenadas manuais (100% precisão)
+        if (record.latitude && record.longitude && !isNaN(record.latitude) && !isNaN(record.longitude)) {
+          console.log(`🎯 Usando coordenadas manuais 100% precisas para ${record.nomeAnimal}:`, { lat: record.latitude, lng: record.longitude });
+          geocodingResult = await geocodeWithManualCoordinates(
+            record.endereco || 'Endereço com coordenadas manuais',
+            record.latitude,
+            record.longitude
+          );
+        } else {
+          // Usar geocodificação automática
+          geocodingResult = await geocodeWithFallback(
+            record.endereco || '', 
+            record.area, 
+            record.quadra
+          );
+        }
         
         console.log(`✅ Resultado geocodificação para ${record.nomeAnimal}:`, geocodingResult);
         
@@ -148,7 +163,9 @@ const VaccinationMapView: React.FC<VaccinationMapViewProps> = ({ vaccinationReco
           ...record,
           coordinates: [geocodingResult.lat, geocodingResult.lng] as [number, number],
           geocodedAddress: geocodingResult.address,
-          geocodingSuccess: geocodingResult.success
+          geocodingSuccess: geocodingResult.success,
+          geocodingSource: geocodingResult.source,
+          geocodingConfidence: geocodingResult.confidence
         };
       })
     );

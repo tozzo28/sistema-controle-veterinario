@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createRabies } from '../api';
 import { X } from 'lucide-react';
+import InteractiveFormMap from './InteractiveFormMap';
 
 interface RabiesVaccineFormProps {
   onClose: () => void;
@@ -32,6 +33,10 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
     // Georreferenciamento
     quadra: '',
     area: '',
+    
+    // Coordenadas
+    latitude: '',
+    longitude: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,6 +52,9 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
         quadra: formData.quadra,
         loteVacina: formData.loteVacina,
         dosePerdida: !!formData.dosePerdida,
+        endereco: formData.endereco,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
       };
       await createRabies(payload);
       onClose();
@@ -60,6 +68,17 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  // Função para lidar com mudanças de coordenadas do mapa
+  const handleMapCoordinatesChange = (lat: number, lng: number, address: string, isManual: boolean) => {
+    console.log('🗺️ [VACINAÇÃO] Coordenadas atualizadas pelo mapa:', { lat, lng, address, isManual });
+    
+    setFormData(prev => ({
+      ...prev,
+      latitude: lat,
+      longitude: lng
+    }));
   };
 
   return (
@@ -187,7 +206,7 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
                 />
               </div>
               
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Endereço Completo *</label>
                 <textarea
                   name="endereco"
@@ -201,6 +220,18 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
                 <p className="text-xs text-gray-500 mt-1">
                   💡 Inclua rua, número, bairro e cidade para localização precisa no mapa
                 </p>
+                
+                {/* Mapa Interativo */}
+                {formData.endereco && formData.endereco.trim().length > 10 && (
+                  <div className="mt-4">
+                    <InteractiveFormMap
+                      address={formData.endereco}
+                      onCoordinatesChange={handleMapCoordinatesChange}
+                      initialLat={formData.latitude as number}
+                      initialLng={formData.longitude as number}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </section>

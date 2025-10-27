@@ -67,6 +67,9 @@ export type RabiesVaccineRecord = {
   quadra: string;
   loteVacina: string;
   dosePerdida?: boolean;
+  endereco?: string;
+  latitude?: number;
+  longitude?: number;
 };
 
 export async function fetchRabies(): Promise<RabiesVaccineRecord[]> {
