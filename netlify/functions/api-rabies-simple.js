@@ -4,7 +4,7 @@ exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   };
 
   if (event.httpMethod === 'OPTIONS') {
@@ -47,6 +47,37 @@ exports.handler = async (event, context) => {
       
       return {
         statusCode: 201,
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify(result.rows[0]),
+      };
+    }
+    
+    if (event.httpMethod === 'PUT') {
+      const { id, ...data } = JSON.parse(event.body);
+      
+      // Converter dataVacinacao para Date se fornecida
+      let dataVacinacao = data.dataVacinacao ? new Date(data.dataVacinacao) : null;
+      
+      const result = await client.query(`
+        UPDATE rabies_vaccine_records 
+        SET "nomeAnimal" = $1, "tipo" = $2, "nomeTutor" = $3, 
+            "dataVacinacao" = COALESCE($4, "dataVacinacao"),
+            "localVacinacao" = $5, "loteVacina" = $6, "quadra" = $7, 
+            "area" = $8, "dosePerdida" = $9, "endereco" = $10, 
+            "latitude" = $11, "longitude" = $12
+        WHERE id = $13
+        RETURNING *
+      `, [
+        data.nomeAnimal, data.tipo, data.nomeTutor, dataVacinacao,
+        data.localVacinacao, data.loteVacina, data.quadra, data.area, 
+        data.dosePerdida || false, data.endereco,
+        data.latitude ? parseFloat(data.latitude) : null,
+        data.longitude ? parseFloat(data.longitude) : null,
+        id
+      ]);
+      
+      return {
+        statusCode: 200,
         headers: { ...headers, 'Content-Type': 'application/json' },
         body: JSON.stringify(result.rows[0]),
       };

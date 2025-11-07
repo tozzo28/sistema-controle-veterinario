@@ -6,6 +6,7 @@ import VaccinationMapView from './VaccinationMapView';
 
 const RabiesVaccineControl: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [onlyLost, setOnlyLost] = useState(false);
@@ -58,8 +59,18 @@ const RabiesVaccineControl: React.FC = () => {
         ))}
       </div>
 
-      {showForm && (
-        <RabiesVaccineForm onClose={() => setShowForm(false)} />
+      {(showForm || editingRecord) && (
+        <RabiesVaccineForm 
+          onClose={() => {
+            setShowForm(false);
+            setEditingRecord(null);
+          }} 
+          onSubmit={() => {
+            // Recarregar a página para atualizar a lista
+            window.location.reload();
+          }}
+          initialData={editingRecord}
+        />
       )}
 
 
@@ -103,7 +114,12 @@ const RabiesVaccineControl: React.FC = () => {
           </label>
         </div>
 
-        <RabiesVaccineList searchTerm={searchTerm} filterType={filterType} onlyLost={onlyLost} />
+        <RabiesVaccineList 
+          searchTerm={searchTerm} 
+          filterType={filterType} 
+          onlyLost={onlyLost}
+          onEdit={(record) => setEditingRecord(record)}
+        />
       </div>
 
       {/* Mapa de Vacinações */}

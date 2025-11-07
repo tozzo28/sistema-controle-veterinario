@@ -1,42 +1,48 @@
 import React, { useState } from 'react';
-import { createRabies } from '../api';
+import { createRabies, updateRabies } from '../api';
 import { X } from 'lucide-react';
 import InteractiveFormMap from './InteractiveFormMap';
 
 interface RabiesVaccineFormProps {
   onClose: () => void;
+  onSubmit?: (data: any) => void;
+  initialData?: any;
 }
 
-const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
+const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose, onSubmit, initialData }) => {
   const [formData, setFormData] = useState({
     // Dados do animal
-    nomeAnimal: '',
-    tipo: 'cao',
-    idade: '',
-    raca: '',
-    sexo: '',
+    nomeAnimal: initialData?.nomeAnimal || '',
+    tipo: initialData?.tipo || 'cao',
+    idade: initialData?.idade || '',
+    raca: initialData?.raca || '',
+    sexo: initialData?.sexo || '',
     
     // Dados do tutor
-    nomeTutor: '',
-    cpf: '',
-    telefone: '',
-    endereco: '',
+    nomeTutor: initialData?.nomeTutor || '',
+    cpf: initialData?.cpf || '',
+    telefone: initialData?.telefone || '',
+    endereco: initialData?.endereco || '',
     
     // Dados da vacinação
-    dataVacinacao: '',
-    localVacinacao: '',
-    loteVacina: '',
-    veterinario: '',
-    clinica: '',
-    dosePerdida: false,
+    dataVacinacao: initialData?.dataVacinacao ? new Date(initialData.dataVacinacao).toISOString().split('T')[0] : '',
+    localVacinacao: initialData?.localVacinacao || '',
+    loteVacina: initialData?.loteVacina || '',
+    veterinario: initialData?.veterinario || '',
+    clinica: initialData?.clinica || '',
+    dosePerdida: initialData?.dosePerdida || false,
     
     // Georreferenciamento
-    quadra: '',
-    area: '',
+    quadra: initialData?.quadra || '',
+    area: initialData?.area || '',
     
     // Coordenadas
-    latitude: '',
-    longitude: '',
+    latitude: initialData?.latitude !== undefined && initialData?.latitude !== null 
+      ? (typeof initialData.latitude === 'string' ? parseFloat(initialData.latitude) || '' : initialData.latitude)
+      : '',
+    longitude: initialData?.longitude !== undefined && initialData?.longitude !== null
+      ? (typeof initialData.longitude === 'string' ? parseFloat(initialData.longitude) || '' : initialData.longitude)
+      : '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,10 +62,21 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
         latitude: formData.latitude,
         longitude: formData.longitude,
       };
-      await createRabies(payload);
+      
+      if (initialData?.id) {
+        // Editar registro existente
+        await updateRabies(initialData.id, payload);
+      } else {
+        // Criar novo registro
+        await createRabies(payload);
+      }
+      
+      if (onSubmit) {
+        onSubmit(payload);
+      }
       onClose();
     } catch (err) {
-      alert('Falha ao registrar vacinação');
+      alert(initialData?.id ? 'Falha ao atualizar vacinação' : 'Falha ao registrar vacinação');
     }
   };
 
@@ -85,7 +102,9 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h3 className="text-xl font-semibold text-gray-900">Registrar Nova Vacinação</h3>
+          <h3 className="text-xl font-semibold text-gray-900">
+            {initialData ? 'Editar Vacinação' : 'Registrar Nova Vacinação'}
+          </h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -133,7 +152,6 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
                   value={formData.idade}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  required
                 />
               </div>
               
@@ -145,7 +163,6 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
                   value={formData.raca}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  required
                 />
               </div>
               
@@ -156,7 +173,6 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
                   value={formData.sexo}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  required
                 >
                   <option value="">Selecione</option>
                   <option value="macho">Macho</option>
@@ -190,7 +206,6 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
                   value={formData.cpf}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  required
                 />
               </div>
               
@@ -202,7 +217,6 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
                   value={formData.telefone}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  required
                 />
               </div>
               
@@ -285,7 +299,6 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
                   value={formData.veterinario}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  required
                 />
               </div>
               
@@ -297,7 +310,6 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
                   value={formData.clinica}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  required
                 />
               </div>
 
@@ -359,7 +371,7 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
               type="submit"
               className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
             >
-              Registrar Vacinação
+              {initialData ? 'Atualizar Vacinação' : 'Registrar Vacinação'}
             </button>
           </div>
         </form>

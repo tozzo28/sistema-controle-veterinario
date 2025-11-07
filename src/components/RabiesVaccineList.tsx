@@ -6,9 +6,11 @@ interface RabiesVaccineListProps {
   searchTerm: string;
   filterType: string;
   onlyLost?: boolean;
+  onEdit?: (record: RabiesVaccineRecord) => void;
+  onView?: (record: RabiesVaccineRecord) => void;
 }
 
-const RabiesVaccineList: React.FC<RabiesVaccineListProps> = ({ searchTerm, filterType, onlyLost = false }) => {
+const RabiesVaccineList: React.FC<RabiesVaccineListProps> = ({ searchTerm, filterType, onlyLost = false, onEdit, onView }) => {
   const [rows, setRows] = useState<RabiesVaccineRecord[]>([]);
 
   useEffect(() => {
@@ -97,13 +99,34 @@ const RabiesVaccineList: React.FC<RabiesVaccineListProps> = ({ searchTerm, filte
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div className="flex space-x-2">
-                  <button className="text-indigo-600 hover:text-indigo-900">
-                    <Eye className="h-4 w-4" />
-                  </button>
-                  <button className="text-yellow-600 hover:text-yellow-900">
-                    <Edit className="h-4 w-4" />
-                  </button>
-                  <button onClick={async () => { await deleteRabies(vacinacao.id); setRows(prev => prev.filter(r => r.id !== vacinacao.id)); }} className="text-red-600 hover:text-red-900">
+                  {onView && (
+                    <button 
+                      onClick={() => onView(vacinacao)}
+                      className="text-indigo-600 hover:text-indigo-900"
+                      title="Visualizar"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </button>
+                  )}
+                  {onEdit && (
+                    <button 
+                      onClick={() => onEdit(vacinacao)}
+                      className="text-yellow-600 hover:text-yellow-900"
+                      title="Editar"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </button>
+                  )}
+                  <button 
+                    onClick={async () => {
+                      if (confirm(`Tem certeza que deseja excluir a vacinação de ${vacinacao.nomeAnimal}?`)) {
+                        await deleteRabies(vacinacao.id);
+                        setRows(prev => prev.filter(r => r.id !== vacinacao.id));
+                      }
+                    }} 
+                    className="text-red-600 hover:text-red-900"
+                    title="Excluir"
+                  >
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>

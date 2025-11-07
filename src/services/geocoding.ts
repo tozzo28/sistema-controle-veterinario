@@ -306,6 +306,12 @@ const geocodeWithPhoton = async (address: string): Promise<GeocodingResult> => {
     console.log('📡 [Photon] Status da resposta:', response.status);
     
     if (!response.ok) {
+      // Erro 400 pode ser esperado (parâmetros inválidos, limites, etc.) - não logar como erro crítico
+      if (response.status === 400) {
+        console.log('ℹ️ [Photon] Requisição inválida ou limite atingido (normal - tentando outras APIs)');
+      } else {
+        console.log(`⚠️ [Photon] Erro HTTP ${response.status} - tentando outras APIs`);
+      }
       throw new Error(`HTTP ${response.status}`);
     }
     
@@ -351,8 +357,14 @@ const geocodeWithPhoton = async (address: string): Promise<GeocodingResult> => {
       confidence: paraguacuResults.length > 0 ? 0.7 : 0.4
     };
     
-  } catch (error) {
-    console.error('❌ [Photon] Erro:', error);
+  } catch (error: any) {
+    // Não logar como erro crítico - é esperado que algumas APIs falhem
+    const errorMessage = error?.message || String(error);
+    if (errorMessage.includes('400')) {
+      console.log('ℹ️ [Photon] Não disponível no momento - tentando próximas APIs...');
+    } else {
+      console.log(`⚠️ [Photon] Não disponível (${errorMessage}) - tentando outras APIs...`);
+    }
     return {
       lat: 0,
       lng: 0,
@@ -387,6 +399,20 @@ const geocodeWithGoogleMaps = async (address: string): Promise<GeocodingResult> 
     
     const data = await response.json();
     console.log('📊 [Google Maps] Dados recebidos:', data);
+    
+    // Verificar se a API retornou erro de autenticação
+    if (data.status === 'REQUEST_DENIED' || data.error_message) {
+      console.log('ℹ️ [Google Maps] Requer chave de API (normal - tentando outras APIs)');
+      return {
+        lat: 0,
+        lng: 0,
+        address: '',
+        success: false,
+        error: 'API requer autenticação',
+        source: 'Google Maps',
+        confidence: 0
+      };
+    }
     
     if (!data.results || data.results.length === 0) {
       return {
@@ -430,8 +456,10 @@ const geocodeWithGoogleMaps = async (address: string): Promise<GeocodingResult> 
       confidence: confidence
     };
     
-  } catch (error) {
-    console.error('❌ [Google Maps] Erro:', error);
+  } catch (error: any) {
+    // Não logar como erro crítico - é esperado que algumas APIs falhem
+    const errorMessage = error?.message || String(error);
+    console.log(`⚠️ [Google Maps] Não disponível (${errorMessage}) - tentando outras APIs...`);
     return {
       lat: 0,
       lng: 0,
@@ -461,6 +489,12 @@ const geocodeWithOpenCage = async (address: string): Promise<GeocodingResult> =>
     console.log('📡 [OpenCage] Status da resposta:', response.status);
     
     if (!response.ok) {
+      // Erro 401 é esperado (sem chave de API) - não logar como erro crítico
+      if (response.status === 401) {
+        console.log('ℹ️ [OpenCage] API requer autenticação (normal - tentando outras APIs)');
+      } else {
+        console.log(`⚠️ [OpenCage] Erro HTTP ${response.status} - tentando outras APIs`);
+      }
       throw new Error(`HTTP ${response.status}`);
     }
     
@@ -499,8 +533,14 @@ const geocodeWithOpenCage = async (address: string): Promise<GeocodingResult> =>
       confidence: bestResult.confidence / 10 // OpenCage usa escala 0-10
     };
     
-  } catch (error) {
-    console.error('❌ [OpenCage] Erro:', error);
+  } catch (error: any) {
+    // Não logar como erro crítico - é esperado que algumas APIs falhem
+    const errorMessage = error?.message || String(error);
+    if (errorMessage.includes('401')) {
+      console.log('ℹ️ [OpenCage] Requer autenticação - tentando próximas APIs...');
+    } else {
+      console.log(`⚠️ [OpenCage] Não disponível (${errorMessage}) - tentando outras APIs...`);
+    }
     return {
       lat: 0,
       lng: 0,
