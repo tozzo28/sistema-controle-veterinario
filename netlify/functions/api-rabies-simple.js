@@ -55,8 +55,28 @@ exports.handler = async (event, context) => {
     if (event.httpMethod === 'PUT') {
       const { id, ...data } = JSON.parse(event.body);
       
+      console.log('🔄 [PUT] Atualizando registro:', { id, data });
+      
       // Converter dataVacinacao para Date se fornecida
       let dataVacinacao = data.dataVacinacao ? new Date(data.dataVacinacao) : null;
+      
+      // Garantir que latitude e longitude sejam números ou null
+      const latitude = (data.latitude !== null && data.latitude !== undefined && data.latitude !== '') 
+        ? parseFloat(data.latitude) 
+        : null;
+      const longitude = (data.longitude !== null && data.longitude !== undefined && data.longitude !== '') 
+        ? parseFloat(data.longitude) 
+        : null;
+      
+      // Verificar se o registro existe
+      const checkResult = await client.query('SELECT id FROM rabies_vaccine_records WHERE id = $1', [id]);
+      if (checkResult.rows.length === 0) {
+        return {
+          statusCode: 404,
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'Registro não encontrado' }),
+        };
+      }
       
       const result = await client.query(`
         UPDATE rabies_vaccine_records 
@@ -70,11 +90,13 @@ exports.handler = async (event, context) => {
       `, [
         data.nomeAnimal, data.tipo, data.nomeTutor, dataVacinacao,
         data.localVacinacao, data.loteVacina, data.quadra, data.area, 
-        data.dosePerdida || false, data.endereco,
-        data.latitude ? parseFloat(data.latitude) : null,
-        data.longitude ? parseFloat(data.longitude) : null,
+        data.dosePerdida || false, data.endereco || null,
+        isNaN(latitude) ? null : latitude,
+        isNaN(longitude) ? null : longitude,
         id
       ]);
+      
+      console.log('✅ [PUT] Registro atualizado:', result.rows[0]);
       
       return {
         statusCode: 200,

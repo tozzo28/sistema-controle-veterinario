@@ -48,6 +48,14 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose, onSubmit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Converter coordenadas vazias para null
+      const latitude = formData.latitude === '' || formData.latitude === null || formData.latitude === undefined 
+        ? null 
+        : (typeof formData.latitude === 'string' ? parseFloat(formData.latitude) : formData.latitude);
+      const longitude = formData.longitude === '' || formData.longitude === null || formData.longitude === undefined 
+        ? null 
+        : (typeof formData.longitude === 'string' ? parseFloat(formData.longitude) : formData.longitude);
+      
       const payload = {
         nomeAnimal: formData.nomeAnimal,
         tipo: formData.tipo as 'cao' | 'gato',
@@ -58,25 +66,33 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose, onSubmit
         quadra: formData.quadra,
         loteVacina: formData.loteVacina,
         dosePerdida: !!formData.dosePerdida,
-        endereco: formData.endereco,
-        latitude: formData.latitude,
-        longitude: formData.longitude,
+        endereco: formData.endereco || null,
+        latitude: isNaN(latitude as number) ? null : latitude,
+        longitude: isNaN(longitude as number) ? null : longitude,
       };
+      
+      console.log('🔄 Enviando dados para atualização:', { id: initialData?.id, payload });
       
       if (initialData?.id) {
         // Editar registro existente
-        await updateRabies(initialData.id, payload);
+        const updated = await updateRabies(initialData.id, payload);
+        console.log('✅ Registro atualizado com sucesso:', updated);
       } else {
         // Criar novo registro
-        await createRabies(payload);
+        const created = await createRabies(payload);
+        console.log('✅ Registro criado com sucesso:', created);
       }
       
+      // Fechar modal primeiro
+      onClose();
+      
+      // Depois executar callback para atualizar a lista
       if (onSubmit) {
         onSubmit(payload);
       }
-      onClose();
     } catch (err) {
-      alert(initialData?.id ? 'Falha ao atualizar vacinação' : 'Falha ao registrar vacinação');
+      console.error('❌ Erro ao salvar:', err);
+      alert(initialData?.id ? `Falha ao atualizar vacinação: ${err}` : `Falha ao registrar vacinação: ${err}`);
     }
   };
 

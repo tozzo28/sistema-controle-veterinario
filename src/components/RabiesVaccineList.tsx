@@ -12,10 +12,20 @@ interface RabiesVaccineListProps {
 
 const RabiesVaccineList: React.FC<RabiesVaccineListProps> = ({ searchTerm, filterType, onlyLost = false, onEdit, onView }) => {
   const [rows, setRows] = useState<RabiesVaccineRecord[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Recarregar lista quando a página receber foco (após edição)
+  useEffect(() => {
+    const handleFocus = () => {
+      fetchRabies().then(setRows).catch(() => setRows([]));
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
   useEffect(() => {
     fetchRabies().then(setRows).catch(() => setRows([]));
-  }, []);
+  }, [refreshKey]);
 
   const getAnimalIcon = (tipo: string) => {
     return tipo === 'cao' ? '🐕' : '🐱';
