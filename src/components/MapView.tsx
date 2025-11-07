@@ -140,12 +140,16 @@ const MapView: React.FC<MapViewProps> = ({ leishmaniasisCases }) => {
         let geocodingResult;
         
         // Verificar se tem coordenadas manuais (100% precisão)
-        if (case_.latitude && case_.longitude && !isNaN(case_.latitude) && !isNaN(case_.longitude)) {
-          console.log(`🎯 Usando coordenadas manuais 100% precisas para ${case_.nomeAnimal}:`, { lat: case_.latitude, lng: case_.longitude });
+        // Converter para número se for string
+        const latNum = typeof case_.latitude === 'string' ? parseFloat(case_.latitude) : case_.latitude;
+        const lngNum = typeof case_.longitude === 'string' ? parseFloat(case_.longitude) : case_.longitude;
+        
+        if (latNum && lngNum && !isNaN(latNum) && !isNaN(lngNum)) {
+          console.log(`🎯 Usando coordenadas manuais 100% precisas para ${case_.nomeAnimal}:`, { lat: latNum, lng: lngNum });
           geocodingResult = await geocodeWithManualCoordinates(
             case_.endereco || 'Endereço com coordenadas manuais',
-            case_.latitude,
-            case_.longitude
+            latNum,
+            lngNum
           );
         } else {
           // Usar geocodificação automática

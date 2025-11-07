@@ -174,7 +174,7 @@ const GoogleMapsTest: React.FC = () => {
               </div>
               
               <div className="mt-3 space-y-1 text-xs text-green-700 dark:text-green-300">
-                <p><strong>📍 Coordenadas:</strong> {result.lat.toFixed(7)}, {result.lng.toFixed(7)}</p>
+                <p><strong>📍 Coordenadas:</strong> {typeof result.lat === 'number' ? result.lat.toFixed(7) : parseFloat(String(result.lat)).toFixed(7)}, {typeof result.lng === 'number' ? result.lng.toFixed(7) : parseFloat(String(result.lng)).toFixed(7)}</p>
                 <p><strong>📍 Endereço Encontrado:</strong> {result.address}</p>
                 <p><strong>🔍 Fonte:</strong> {result.source}</p>
                 <p><strong>🎯 Confiança:</strong> {Math.round((result.confidence || 0) * 100)}%</p>

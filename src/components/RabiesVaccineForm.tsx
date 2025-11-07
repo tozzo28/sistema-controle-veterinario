@@ -227,8 +227,8 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose }) => {
                     <InteractiveFormMap
                       address={formData.endereco}
                       onCoordinatesChange={handleMapCoordinatesChange}
-                      initialLat={formData.latitude as number}
-                      initialLng={formData.longitude as number}
+                      initialLat={formData.latitude ? (typeof formData.latitude === 'string' ? parseFloat(formData.latitude) : formData.latitude) : undefined}
+                      initialLng={formData.longitude ? (typeof formData.longitude === 'string' ? parseFloat(formData.longitude) : formData.longitude) : undefined}
                     />
                   </div>
                 )}

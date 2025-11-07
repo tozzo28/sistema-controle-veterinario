@@ -142,12 +142,16 @@ const VaccinationMapView: React.FC<VaccinationMapViewProps> = ({ vaccinationReco
         let geocodingResult;
         
         // Verificar se tem coordenadas manuais (100% precisão)
-        if (record.latitude && record.longitude && !isNaN(record.latitude) && !isNaN(record.longitude)) {
-          console.log(`🎯 Usando coordenadas manuais 100% precisas para ${record.nomeAnimal}:`, { lat: record.latitude, lng: record.longitude });
+        // Converter para número se for string
+        const latNum = typeof record.latitude === 'string' ? parseFloat(record.latitude) : record.latitude;
+        const lngNum = typeof record.longitude === 'string' ? parseFloat(record.longitude) : record.longitude;
+        
+        if (latNum && lngNum && !isNaN(latNum) && !isNaN(lngNum)) {
+          console.log(`🎯 Usando coordenadas manuais 100% precisas para ${record.nomeAnimal}:`, { lat: latNum, lng: lngNum });
           geocodingResult = await geocodeWithManualCoordinates(
             record.endereco || 'Endereço com coordenadas manuais',
-            record.latitude,
-            record.longitude
+            latNum,
+            lngNum
           );
         } else {
           // Usar geocodificação automática

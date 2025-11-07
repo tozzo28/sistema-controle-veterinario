@@ -85,7 +85,7 @@ const GeocodingTest: React.FC = () => {
                 
                 {result.success ? (
                   <div className="mt-2 space-y-1 text-sm">
-                    <p><strong>Coordenadas:</strong> {result.lat.toFixed(6)}, {result.lng.toFixed(6)}</p>
+                    <p><strong>Coordenadas:</strong> {typeof result.lat === 'number' ? result.lat.toFixed(6) : parseFloat(String(result.lat)).toFixed(6)}, {typeof result.lng === 'number' ? result.lng.toFixed(6) : parseFloat(String(result.lng)).toFixed(6)}</p>
                     <p><strong>Endereço encontrado:</strong> {result.address}</p>
                   </div>
                 ) : (

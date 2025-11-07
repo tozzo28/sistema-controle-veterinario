@@ -33,9 +33,13 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
     // Status
     status: initialData?.status || 'notificado',
     
-    // Coordenadas Manuais
-    latitude: initialData?.latitude || '',
-    longitude: initialData?.longitude || '',
+    // Coordenadas Manuais (garantir que sejam números ou strings vazias)
+    latitude: initialData?.latitude !== undefined && initialData?.latitude !== null 
+      ? (typeof initialData.latitude === 'string' ? parseFloat(initialData.latitude) || '' : initialData.latitude)
+      : '',
+    longitude: initialData?.longitude !== undefined && initialData?.longitude !== null
+      ? (typeof initialData.longitude === 'string' ? parseFloat(initialData.longitude) || '' : initialData.longitude)
+      : '',
   });
 
   // Estado para geocodificação em tempo real
@@ -376,7 +380,7 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                             <strong>Endereço:</strong> {geocodingState.result.address}
                           </p>
                           <p className="text-xs text-green-700 dark:text-green-300">
-                            <strong>Coordenadas:</strong> {geocodingState.result.lat.toFixed(6)}, {geocodingState.result.lng.toFixed(6)}
+                            <strong>Coordenadas:</strong> {typeof geocodingState.result.lat === 'number' ? geocodingState.result.lat.toFixed(6) : parseFloat(String(geocodingState.result.lat)).toFixed(6)}, {typeof geocodingState.result.lng === 'number' ? geocodingState.result.lng.toFixed(6) : parseFloat(String(geocodingState.result.lng)).toFixed(6)}
                           </p>
                           <p className="text-xs text-green-700 dark:text-green-300">
                             <strong>Fonte:</strong> {geocodingState.result.source}
@@ -439,8 +443,8 @@ const LeishmaniasisForm: React.FC<LeishmaniasisFormProps> = ({ onClose, onSubmit
                     <InteractiveFormMap
                       address={formData.endereco}
                       onCoordinatesChange={handleMapCoordinatesChange}
-                      initialLat={formData.latitude as number}
-                      initialLng={formData.longitude as number}
+                      initialLat={formData.latitude ? (typeof formData.latitude === 'string' ? parseFloat(formData.latitude) : formData.latitude) : undefined}
+                      initialLng={formData.longitude ? (typeof formData.longitude === 'string' ? parseFloat(formData.longitude) : formData.longitude) : undefined}
                     />
                   </div>
                 )}

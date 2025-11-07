@@ -98,12 +98,16 @@ const InteractiveFormMap: React.FC<InteractiveFormMapProps> = ({
 
   // Inicializar com coordenadas iniciais se fornecidas
   useEffect(() => {
-    if (initialLat && initialLng && !isNaN(initialLat) && !isNaN(initialLng)) {
-      const position: [number, number] = [initialLat, initialLng];
+    // Converter para número se for string
+    const latNum = typeof initialLat === 'string' ? parseFloat(initialLat) : initialLat;
+    const lngNum = typeof initialLng === 'string' ? parseFloat(initialLng) : initialLng;
+    
+    if (latNum && lngNum && !isNaN(latNum) && !isNaN(lngNum)) {
+      const position: [number, number] = [latNum, lngNum];
       setMapCenter(position);
       setMarkerPosition(position);
       setIsManualPosition(true);
-      console.log('🎯 [MAPA] Coordenadas iniciais carregadas:', { lat: initialLat, lng: initialLng });
+      console.log('🎯 [MAPA] Coordenadas iniciais carregadas:', { lat: latNum, lng: lngNum });
     }
   }, [initialLat, initialLng]);
 
@@ -260,8 +264,8 @@ const InteractiveFormMap: React.FC<InteractiveFormMapProps> = ({
                   </p>
                   <p className="text-xs text-gray-600 mt-1">
                     <strong>Coordenadas:</strong><br />
-                    Lat: {markerPosition[0].toFixed(6)}<br />
-                    Lng: {markerPosition[1].toFixed(6)}
+                    Lat: {typeof markerPosition[0] === 'number' ? markerPosition[0].toFixed(6) : parseFloat(String(markerPosition[0])).toFixed(6)}<br />
+                    Lng: {typeof markerPosition[1] === 'number' ? markerPosition[1].toFixed(6) : parseFloat(String(markerPosition[1])).toFixed(6)}
                   </p>
                   {geocodingResult && !isManualPosition && (
                     <div className="text-xs text-gray-500 mt-2">
