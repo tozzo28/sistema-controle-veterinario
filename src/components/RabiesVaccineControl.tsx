@@ -3,10 +3,13 @@ import { Plus, Search, Filter } from 'lucide-react';
 import RabiesVaccineForm from './RabiesVaccineForm';
 import RabiesVaccineList from './RabiesVaccineList';
 import VaccinationMapView from './VaccinationMapView';
+import VaccinationDetailsModal from './VaccinationDetailsModal';
+import { RabiesVaccineRecord } from '../api';
 
 const RabiesVaccineControl: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
-  const [editingRecord, setEditingRecord] = useState<any>(null);
+  const [editingRecord, setEditingRecord] = useState<RabiesVaccineRecord | null>(null);
+  const [viewingRecord, setViewingRecord] = useState<RabiesVaccineRecord | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [onlyLost, setOnlyLost] = useState(false);
@@ -121,8 +124,17 @@ const RabiesVaccineControl: React.FC = () => {
           filterType={filterType} 
           onlyLost={onlyLost}
           onEdit={(record) => setEditingRecord(record)}
+          onView={(record) => setViewingRecord(record)}
         />
       </div>
+
+      {/* Modal de Visualização */}
+      {viewingRecord && (
+        <VaccinationDetailsModal 
+          record={viewingRecord} 
+          onClose={() => setViewingRecord(null)} 
+        />
+      )}
 
       {/* Mapa de Vacinações */}
       <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
