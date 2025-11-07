@@ -71,28 +71,47 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose, onSubmit
         longitude: isNaN(longitude as number) ? null : longitude,
       };
       
-      console.log('🔄 Enviando dados para atualização:', { id: initialData?.id, payload });
+      console.log('🔄 [FORM] Enviando dados para atualização:', { 
+        id: initialData?.id, 
+        payload,
+        hasInitialData: !!initialData?.id
+      });
       
       if (initialData?.id) {
         // Editar registro existente
+        console.log('✏️ [FORM] Iniciando atualização do registro ID:', initialData.id);
         const updated = await updateRabies(initialData.id, payload);
-        console.log('✅ Registro atualizado com sucesso:', updated);
+        console.log('✅ [FORM] Registro atualizado com sucesso no backend:', updated);
+        
+        // Aguardar um pouco para garantir que o backend processou
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        // Mostrar mensagem de sucesso
+        alert('Vacinação atualizada com sucesso!');
       } else {
         // Criar novo registro
+        console.log('➕ [FORM] Criando novo registro');
         const created = await createRabies(payload);
-        console.log('✅ Registro criado com sucesso:', created);
+        console.log('✅ [FORM] Registro criado com sucesso:', created);
+        alert('Vacinação registrada com sucesso!');
       }
       
-      // Fechar modal primeiro
+      // Fechar modal
       onClose();
       
-      // Depois executar callback para atualizar a lista
+      // Executar callback para atualizar a lista (recarregar página)
       if (onSubmit) {
-        onSubmit(payload);
+        console.log('🔄 [FORM] Executando callback onSubmit');
+        await onSubmit(payload);
       }
-    } catch (err) {
-      console.error('❌ Erro ao salvar:', err);
-      alert(initialData?.id ? `Falha ao atualizar vacinação: ${err}` : `Falha ao registrar vacinação: ${err}`);
+    } catch (err: any) {
+      console.error('❌ [FORM] Erro completo ao salvar:', err);
+      console.error('❌ [FORM] Stack trace:', err.stack);
+      const errorMessage = err?.message || String(err);
+      alert(initialData?.id 
+        ? `Falha ao atualizar vacinação:\n${errorMessage}\n\nVerifique o console para mais detalhes.` 
+        : `Falha ao registrar vacinação:\n${errorMessage}\n\nVerifique o console para mais detalhes.`
+      );
     }
   };
 

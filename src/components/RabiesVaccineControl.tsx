@@ -68,9 +68,11 @@ const RabiesVaccineControl: React.FC = () => {
             setShowForm(false);
             setEditingRecord(null);
           }} 
-          onSubmit={async () => {
-            // Aguardar um pouco para garantir que o backend processou
-            await new Promise(resolve => setTimeout(resolve, 500));
+          onSubmit={async (data) => {
+            console.log('🔄 [CONTROL] Callback onSubmit chamado com dados:', data);
+            // Aguardar um pouco mais para garantir que o backend processou completamente
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            console.log('🔄 [CONTROL] Recarregando página...');
             // Recarregar a página para atualizar a lista e estatísticas
             window.location.reload();
           }}

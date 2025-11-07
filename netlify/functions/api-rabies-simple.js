@@ -53,56 +53,112 @@ exports.handler = async (event, context) => {
     }
     
     if (event.httpMethod === 'PUT') {
-      const { id, ...data } = JSON.parse(event.body);
-      
-      console.log('🔄 [PUT] Atualizando registro:', { id, data });
-      
-      // Converter dataVacinacao para Date se fornecida
-      let dataVacinacao = data.dataVacinacao ? new Date(data.dataVacinacao) : null;
-      
-      // Garantir que latitude e longitude sejam números ou null
-      const latitude = (data.latitude !== null && data.latitude !== undefined && data.latitude !== '') 
-        ? parseFloat(data.latitude) 
-        : null;
-      const longitude = (data.longitude !== null && data.longitude !== undefined && data.longitude !== '') 
-        ? parseFloat(data.longitude) 
-        : null;
-      
-      // Verificar se o registro existe
-      const checkResult = await client.query('SELECT id FROM rabies_vaccine_records WHERE id = $1', [id]);
-      if (checkResult.rows.length === 0) {
+      try {
+        const body = JSON.parse(event.body);
+        const { id, ...data } = body;
+        
+        console.log('🔄 [PUT] Recebida requisição de atualização');
+        console.log('🔄 [PUT] ID:', id);
+        console.log('🔄 [PUT] Dados recebidos:', JSON.stringify(data, null, 2));
+        
+        if (!id) {
+          return {
+            statusCode: 400,
+            headers: { ...headers, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'ID do registro é obrigatório' }),
+          };
+        }
+        
+        // Converter dataVacinacao para Date se fornecida
+        let dataVacinacao = null;
+        if (data.dataVacinacao) {
+          try {
+            dataVacinacao = new Date(data.dataVacinacao);
+            if (isNaN(dataVacinacao.getTime())) {
+              console.warn('⚠️ [PUT] Data inválida, usando null:', data.dataVacinacao);
+              dataVacinacao = null;
+            }
+          } catch (e) {
+            console.warn('⚠️ [PUT] Erro ao converter data:', e);
+            dataVacinacao = null;
+          }
+        }
+        
+        // Garantir que latitude e longitude sejam números ou null
+        const latitude = (data.latitude !== null && data.latitude !== undefined && data.latitude !== '') 
+          ? parseFloat(data.latitude) 
+          : null;
+        const longitude = (data.longitude !== null && data.longitude !== undefined && data.longitude !== '') 
+          ? parseFloat(data.longitude) 
+          : null;
+        
+        console.log('🔄 [PUT] Valores processados:', {
+          dataVacinacao: dataVacinacao?.toISOString() || null,
+          latitude: isNaN(latitude) ? null : latitude,
+          longitude: isNaN(longitude) ? null : longitude,
+        });
+        
+        // Verificar se o registro existe
+        const checkResult = await client.query('SELECT id FROM rabies_vaccine_records WHERE id = $1', [id]);
+        if (checkResult.rows.length === 0) {
+          console.error('❌ [PUT] Registro não encontrado:', id);
+          return {
+            statusCode: 404,
+            headers: { ...headers, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: `Registro com ID ${id} não encontrado` }),
+          };
+        }
+        
+        console.log('✅ [PUT] Registro encontrado, executando UPDATE...');
+        
+        const result = await client.query(`
+          UPDATE rabies_vaccine_records 
+          SET "nomeAnimal" = $1, "tipo" = $2, "nomeTutor" = $3, 
+              "dataVacinacao" = COALESCE($4, "dataVacinacao"),
+              "localVacinacao" = $5, "loteVacina" = $6, "quadra" = $7, 
+              "area" = $8, "dosePerdida" = $9, "endereco" = $10, 
+              "latitude" = $11, "longitude" = $12
+          WHERE id = $13
+          RETURNING *
+        `, [
+          data.nomeAnimal, data.tipo, data.nomeTutor, dataVacinacao,
+          data.localVacinacao, data.loteVacina, data.quadra, data.area, 
+          data.dosePerdida || false, data.endereco || null,
+          isNaN(latitude) ? null : latitude,
+          isNaN(longitude) ? null : longitude,
+          id
+        ]);
+        
+        if (result.rows.length === 0) {
+          console.error('❌ [PUT] Nenhuma linha foi atualizada');
+          return {
+            statusCode: 500,
+            headers: { ...headers, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Nenhuma linha foi atualizada' }),
+          };
+        }
+        
+        console.log('✅ [PUT] Registro atualizado com sucesso:', result.rows[0]);
+        console.log('✅ [PUT] Nome animal atualizado:', result.rows[0].nomeAnimal);
+        console.log('✅ [PUT] Tutor atualizado:', result.rows[0].nomeTutor);
+        
         return {
-          statusCode: 404,
+          statusCode: 200,
           headers: { ...headers, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ error: 'Registro não encontrado' }),
+          body: JSON.stringify(result.rows[0]),
+        };
+      } catch (updateError) {
+        console.error('❌ [PUT] Erro ao processar atualização:', updateError);
+        console.error('❌ [PUT] Stack:', updateError.stack);
+        return {
+          statusCode: 500,
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            error: 'Erro interno ao atualizar registro',
+            details: updateError.message 
+          }),
         };
       }
-      
-      const result = await client.query(`
-        UPDATE rabies_vaccine_records 
-        SET "nomeAnimal" = $1, "tipo" = $2, "nomeTutor" = $3, 
-            "dataVacinacao" = COALESCE($4, "dataVacinacao"),
-            "localVacinacao" = $5, "loteVacina" = $6, "quadra" = $7, 
-            "area" = $8, "dosePerdida" = $9, "endereco" = $10, 
-            "latitude" = $11, "longitude" = $12
-        WHERE id = $13
-        RETURNING *
-      `, [
-        data.nomeAnimal, data.tipo, data.nomeTutor, dataVacinacao,
-        data.localVacinacao, data.loteVacina, data.quadra, data.area, 
-        data.dosePerdida || false, data.endereco || null,
-        isNaN(latitude) ? null : latitude,
-        isNaN(longitude) ? null : longitude,
-        id
-      ]);
-      
-      console.log('✅ [PUT] Registro atualizado:', result.rows[0]);
-      
-      return {
-        statusCode: 200,
-        headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify(result.rows[0]),
-      };
     }
     
     if (event.httpMethod === 'DELETE') {

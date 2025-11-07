@@ -89,13 +89,29 @@ export async function createRabies(data: Omit<RabiesVaccineRecord, 'id' | 'dataV
 }
 
 export async function updateRabies(id: number, data: Omit<RabiesVaccineRecord, 'id' | 'dataVacinacao'>): Promise<RabiesVaccineRecord> {
+  console.log('📡 [API] Enviando requisição PUT:', { id, data });
   const res = await fetch(`${BASE_URL}/.netlify/functions/api-rabies-simple`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ id, ...data }),
   });
-  if (!res.ok) throw new Error('Falha ao atualizar vacinação');
-  return res.json();
+  
+  console.log('📡 [API] Status da resposta:', res.status, res.statusText);
+  
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error('❌ [API] Erro na resposta:', errorText);
+    try {
+      const errorData = JSON.parse(errorText);
+      throw new Error(errorData.error || `Falha ao atualizar vacinação: ${res.status} ${res.statusText}`);
+    } catch {
+      throw new Error(`Falha ao atualizar vacinação: ${res.status} ${res.statusText} - ${errorText}`);
+    }
+  }
+  
+  const result = await res.json();
+  console.log('✅ [API] Dados atualizados recebidos:', result);
+  return result;
 }
 
 export async function deleteRabies(id: number): Promise<void> {
