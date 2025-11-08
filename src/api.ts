@@ -70,6 +70,14 @@ export type RabiesVaccineRecord = {
   endereco?: string;
   latitude?: number;
   longitude?: number;
+  // Campos adicionais do animal e tutor
+  idade?: string;
+  raca?: string;
+  sexo?: string;
+  cpf?: string;
+  telefone?: string;
+  veterinario?: string;
+  clinica?: string;
 };
 
 export async function fetchRabies(): Promise<RabiesVaccineRecord[]> {

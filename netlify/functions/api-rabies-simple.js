@@ -30,6 +30,13 @@ exports.handler = async (event, context) => {
         console.log('📋 [GET] Registro ID', row.id, ':', {
           nomeAnimal: row.nomeAnimal,
           nomeTutor: row.nomeTutor,
+          idade: row.idade,
+          raca: row.raca,
+          sexo: row.sexo,
+          cpf: row.cpf,
+          telefone: row.telefone,
+          veterinario: row.veterinario,
+          clinica: row.clinica,
           localVacinacao: row.localVacinacao,
           area: row.area,
           quadra: row.quadra,
@@ -45,14 +52,38 @@ exports.handler = async (event, context) => {
     
     if (event.httpMethod === 'POST') {
       const data = JSON.parse(event.body);
+      
+      // Converter dataVacinacao para Date se fornecida
+      let dataVacinacao = data.dataVacinacao ? new Date(data.dataVacinacao) : new Date();
+      if (isNaN(dataVacinacao.getTime())) {
+        dataVacinacao = new Date();
+      }
+      
       const result = await client.query(`
         INSERT INTO rabies_vaccine_records 
-        ("nomeAnimal", "tipo", "nomeTutor", "localVacinacao", "loteVacina", "quadra", "area", "dosePerdida", "endereco", "latitude", "longitude")
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        ("nomeAnimal", "tipo", "nomeTutor", "idade", "raca", "sexo", "cpf", "telefone", 
+         "dataVacinacao", "localVacinacao", "loteVacina", "veterinario", "clinica", 
+         "quadra", "area", "dosePerdida", "endereco", "latitude", "longitude")
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
         RETURNING *
       `, [
-        data.nomeAnimal, data.tipo, data.nomeTutor, data.localVacinacao, data.loteVacina,
-        data.quadra, data.area, data.dosePerdida || false, data.endereco,
+        data.nomeAnimal, 
+        data.tipo, 
+        data.nomeTutor, 
+        data.idade || null,
+        data.raca || null,
+        data.sexo || null,
+        data.cpf || null,
+        data.telefone || null,
+        dataVacinacao,
+        data.localVacinacao, 
+        data.loteVacina,
+        data.veterinario || null,
+        data.clinica || null,
+        data.quadra, 
+        data.area, 
+        data.dosePerdida || false, 
+        data.endereco || null,
         data.latitude ? parseFloat(data.latitude) : null,
         data.longitude ? parseFloat(data.longitude) : null
       ]);
@@ -90,9 +121,16 @@ exports.handler = async (event, context) => {
         nomeAnimal: updateData.nomeAnimal,
         tipo: updateData.tipo,
         nomeTutor: updateData.nomeTutor,
+        idade: updateData.idade || null,
+        raca: updateData.raca || null,
+        sexo: updateData.sexo || null,
+        cpf: updateData.cpf || null,
+        telefone: updateData.telefone || null,
         dataVacinacao: dataVacinacao?.toISOString() || 'null (manter atual)',
         localVacinacao: updateData.localVacinacao,
         loteVacina: updateData.loteVacina,
+        veterinario: updateData.veterinario || null,
+        clinica: updateData.clinica || null,
         quadra: updateData.quadra,
         area: updateData.area,
         dosePerdida: updateData.dosePerdida || false,
@@ -104,16 +142,34 @@ exports.handler = async (event, context) => {
       const result = await client.query(`
         UPDATE rabies_vaccine_records 
         SET "nomeAnimal" = $1, "tipo" = $2, "nomeTutor" = $3, 
-            "dataVacinacao" = COALESCE($4, "dataVacinacao"),
-            "localVacinacao" = $5, "loteVacina" = $6, "quadra" = $7, 
-            "area" = $8, "dosePerdida" = $9, "endereco" = $10, 
-            "latitude" = $11, "longitude" = $12
-        WHERE id = $13
+            "idade" = $4, "raca" = $5, "sexo" = $6,
+            "cpf" = $7, "telefone" = $8,
+            "dataVacinacao" = COALESCE($9, "dataVacinacao"),
+            "localVacinacao" = $10, "loteVacina" = $11, 
+            "veterinario" = $12, "clinica" = $13,
+            "quadra" = $14, "area" = $15, 
+            "dosePerdida" = $16, "endereco" = $17, 
+            "latitude" = $18, "longitude" = $19
+        WHERE id = $20
         RETURNING *
       `, [
-        updateData.nomeAnimal, updateData.tipo, updateData.nomeTutor, dataVacinacao,
-        updateData.localVacinacao, updateData.loteVacina, updateData.quadra, updateData.area, 
-        updateData.dosePerdida || false, updateData.endereco || null,
+        updateData.nomeAnimal, 
+        updateData.tipo, 
+        updateData.nomeTutor,
+        updateData.idade || null,
+        updateData.raca || null,
+        updateData.sexo || null,
+        updateData.cpf || null,
+        updateData.telefone || null,
+        dataVacinacao,
+        updateData.localVacinacao, 
+        updateData.loteVacina,
+        updateData.veterinario || null,
+        updateData.clinica || null,
+        updateData.quadra, 
+        updateData.area, 
+        updateData.dosePerdida || false, 
+        updateData.endereco || null,
         updateData.latitude ? parseFloat(updateData.latitude) : null,
         updateData.longitude ? parseFloat(updateData.longitude) : null,
         id
@@ -133,10 +189,17 @@ exports.handler = async (event, context) => {
         id: result.rows[0].id,
         nomeAnimal: result.rows[0].nomeAnimal,
         nomeTutor: result.rows[0].nomeTutor,
+        idade: result.rows[0].idade,
+        raca: result.rows[0].raca,
+        sexo: result.rows[0].sexo,
+        cpf: result.rows[0].cpf,
+        telefone: result.rows[0].telefone,
         localVacinacao: result.rows[0].localVacinacao,
         area: result.rows[0].area,
         quadra: result.rows[0].quadra,
         loteVacina: result.rows[0].loteVacina,
+        veterinario: result.rows[0].veterinario,
+        clinica: result.rows[0].clinica,
         endereco: result.rows[0].endereco,
         latitude: result.rows[0].latitude,
         longitude: result.rows[0].longitude,
@@ -149,6 +212,13 @@ exports.handler = async (event, context) => {
           id: verifyResult.rows[0].id,
           nomeAnimal: verifyResult.rows[0].nomeAnimal,
           nomeTutor: verifyResult.rows[0].nomeTutor,
+          idade: verifyResult.rows[0].idade,
+          raca: verifyResult.rows[0].raca,
+          sexo: verifyResult.rows[0].sexo,
+          cpf: verifyResult.rows[0].cpf,
+          telefone: verifyResult.rows[0].telefone,
+          veterinario: verifyResult.rows[0].veterinario,
+          clinica: verifyResult.rows[0].clinica,
           localVacinacao: verifyResult.rows[0].localVacinacao,
           area: verifyResult.rows[0].area,
           quadra: verifyResult.rows[0].quadra,
