@@ -73,6 +73,22 @@ exports.handler = async (event, context) => {
       
       // Se não há data válida, manter a data atual do registro (usando COALESCE no SQL)
       
+      console.log('🔄 [PUT] Executando UPDATE com valores:', {
+        id: id,
+        nomeAnimal: updateData.nomeAnimal,
+        tipo: updateData.tipo,
+        nomeTutor: updateData.nomeTutor,
+        dataVacinacao: dataVacinacao?.toISOString() || 'null (manter atual)',
+        localVacinacao: updateData.localVacinacao,
+        loteVacina: updateData.loteVacina,
+        quadra: updateData.quadra,
+        area: updateData.area,
+        dosePerdida: updateData.dosePerdida || false,
+        endereco: updateData.endereco || null,
+        latitude: updateData.latitude ? parseFloat(updateData.latitude) : null,
+        longitude: updateData.longitude ? parseFloat(updateData.longitude) : null,
+      });
+      
       const result = await client.query(`
         UPDATE rabies_vaccine_records 
         SET "nomeAnimal" = $1, "tipo" = $2, "nomeTutor" = $3, 
@@ -90,6 +106,25 @@ exports.handler = async (event, context) => {
         updateData.longitude ? parseFloat(updateData.longitude) : null,
         id
       ]);
+      
+      if (!result.rows || result.rows.length === 0) {
+        console.error('❌ [PUT] UPDATE não retornou nenhuma linha');
+        return {
+          statusCode: 500,
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'UPDATE não retornou dados' }),
+        };
+      }
+      
+      console.log('✅ [PUT] UPDATE executado com sucesso');
+      console.log('✅ [PUT] Dados atualizados:', {
+        id: result.rows[0].id,
+        nomeAnimal: result.rows[0].nomeAnimal,
+        nomeTutor: result.rows[0].nomeTutor,
+        localVacinacao: result.rows[0].localVacinacao,
+        area: result.rows[0].area,
+        quadra: result.rows[0].quadra,
+      });
       
       return {
         statusCode: 200,
