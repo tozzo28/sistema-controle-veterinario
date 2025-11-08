@@ -164,6 +164,7 @@ const RabiesVaccineControl: React.FC = () => {
         </div>
 
         <RabiesVaccineList 
+          key={refreshKey}
           searchTerm={searchTerm} 
           filterType={filterType} 
           onlyLost={onlyLost}
