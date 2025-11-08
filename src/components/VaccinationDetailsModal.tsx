@@ -8,6 +8,20 @@ interface VaccinationDetailsModalProps {
 }
 
 const VaccinationDetailsModal: React.FC<VaccinationDetailsModalProps> = ({ record, onClose }) => {
+  // Log para debug - verificar quais dados estão sendo recebidos
+  React.useEffect(() => {
+    console.log('📋 [MODAL] Dados do registro recebidos:', record);
+    console.log('📋 [MODAL] Campos específicos:', {
+      idade: record.idade,
+      raca: record.raca,
+      sexo: record.sexo,
+      cpf: record.cpf,
+      telefone: record.telefone,
+      veterinario: record.veterinario,
+      clinica: record.clinica,
+    });
+  }, [record]);
+  
   const getTipoAnimalBadge = (tipo: string) => {
     const tipoConfig = {
       cao: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',

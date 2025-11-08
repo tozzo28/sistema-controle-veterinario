@@ -177,6 +177,7 @@ const RabiesVaccineControl: React.FC = () => {
       {/* Modal de Visualização */}
       {viewingRecord && (
         <VaccinationDetailsModal 
+          key={viewingRecord.id} 
           record={viewingRecord} 
           onClose={() => setViewingRecord(null)} 
         />
