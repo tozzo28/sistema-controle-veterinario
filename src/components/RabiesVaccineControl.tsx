@@ -4,7 +4,7 @@ import RabiesVaccineForm from './RabiesVaccineForm';
 import RabiesVaccineList from './RabiesVaccineList';
 import VaccinationMapView from './VaccinationMapView';
 import VaccinationDetailsModal from './VaccinationDetailsModal';
-import { RabiesVaccineRecord } from '../api';
+import { RabiesVaccineRecord, createRabies, updateRabies } from '../api';
 
 const RabiesVaccineControl: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
@@ -68,13 +68,30 @@ const RabiesVaccineControl: React.FC = () => {
             setShowForm(false);
             setEditingRecord(null);
           }} 
-          onSubmit={async (data) => {
-            console.log('🔄 [CONTROL] Callback onSubmit chamado com dados:', data);
-            // Aguardar um pouco mais para garantir que o backend processou completamente
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            console.log('🔄 [CONTROL] Recarregando página...');
-            // Recarregar a página para atualizar a lista e estatísticas
-            window.location.reload();
+          onSubmit={async (formData) => {
+            try {
+              if (editingRecord?.id) {
+                // Editar registro existente
+                console.log('🔄 Atualizando vacinação:', editingRecord.id, formData);
+                await updateRabies(editingRecord.id, formData);
+                console.log('✅ Vacinação atualizada com sucesso');
+              } else {
+                // Criar novo registro
+                console.log('➕ Criando nova vacinação:', formData);
+                await createRabies(formData);
+                console.log('✅ Vacinação criada com sucesso');
+              }
+              
+              // Fechar o modal
+              setShowForm(false);
+              setEditingRecord(null);
+              
+              // Recarregar a página para atualizar a lista e estatísticas
+              window.location.reload();
+            } catch (error) {
+              console.error('❌ Erro ao salvar vacinação:', error);
+              alert('Erro ao salvar vacinação. Tente novamente.');
+            }
           }}
           initialData={editingRecord}
         />

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { createRabies, updateRabies } from '../api';
 import { X } from 'lucide-react';
 import InteractiveFormMap from './InteractiveFormMap';
 
 interface RabiesVaccineFormProps {
   onClose: () => void;
-  onSubmit?: (data: any) => void;
+  onSubmit: (data: any) => void;
   initialData?: any;
 }
 
@@ -45,74 +44,40 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose, onSubmit
       : '',
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      // Converter coordenadas vazias para null
-      const latitude = formData.latitude === '' || formData.latitude === null || formData.latitude === undefined 
-        ? null 
-        : (typeof formData.latitude === 'string' ? parseFloat(formData.latitude) : formData.latitude);
-      const longitude = formData.longitude === '' || formData.longitude === null || formData.longitude === undefined 
-        ? null 
-        : (typeof formData.longitude === 'string' ? parseFloat(formData.longitude) : formData.longitude);
-      
-      const payload = {
-        nomeAnimal: formData.nomeAnimal,
-        tipo: formData.tipo as 'cao' | 'gato',
-        nomeTutor: formData.nomeTutor,
-        dataVacinacao: formData.dataVacinacao || new Date().toISOString(),
-        localVacinacao: formData.localVacinacao,
-        area: formData.area,
-        quadra: formData.quadra,
-        loteVacina: formData.loteVacina,
-        dosePerdida: !!formData.dosePerdida,
-        endereco: formData.endereco || null,
-        latitude: isNaN(latitude as number) ? null : latitude,
-        longitude: isNaN(longitude as number) ? null : longitude,
-      };
-      
-      console.log('🔄 [FORM] Enviando dados para atualização:', { 
-        id: initialData?.id, 
-        payload,
-        hasInitialData: !!initialData?.id
-      });
-      
-      if (initialData?.id) {
-        // Editar registro existente
-        console.log('✏️ [FORM] Iniciando atualização do registro ID:', initialData.id);
-        const updated = await updateRabies(initialData.id, payload);
-        console.log('✅ [FORM] Registro atualizado com sucesso no backend:', updated);
-        
-        // Aguardar um pouco para garantir que o backend processou
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        // Mostrar mensagem de sucesso
-        alert('Vacinação atualizada com sucesso!');
-      } else {
-        // Criar novo registro
-        console.log('➕ [FORM] Criando novo registro');
-        const created = await createRabies(payload);
-        console.log('✅ [FORM] Registro criado com sucesso:', created);
-        alert('Vacinação registrada com sucesso!');
-      }
-      
-      // Fechar modal
-      onClose();
-      
-      // Executar callback para atualizar a lista (recarregar página)
-      if (onSubmit) {
-        console.log('🔄 [FORM] Executando callback onSubmit');
-        await onSubmit(payload);
-      }
-    } catch (err: any) {
-      console.error('❌ [FORM] Erro completo ao salvar:', err);
-      console.error('❌ [FORM] Stack trace:', err.stack);
-      const errorMessage = err?.message || String(err);
-      alert(initialData?.id 
-        ? `Falha ao atualizar vacinação:\n${errorMessage}\n\nVerifique o console para mais detalhes.` 
-        : `Falha ao registrar vacinação:\n${errorMessage}\n\nVerifique o console para mais detalhes.`
-      );
+    
+    // Validação básica
+    if (!formData.nomeAnimal || !formData.nomeTutor || !formData.area || !formData.quadra) {
+      alert('Por favor, preencha todos os campos obrigatórios.');
+      return;
     }
+    
+    // Converter coordenadas vazias para null
+    const latitude = formData.latitude === '' || formData.latitude === null || formData.latitude === undefined 
+      ? null 
+      : (typeof formData.latitude === 'string' ? parseFloat(formData.latitude) : formData.latitude);
+    const longitude = formData.longitude === '' || formData.longitude === null || formData.longitude === undefined 
+      ? null 
+      : (typeof formData.longitude === 'string' ? parseFloat(formData.longitude) : formData.longitude);
+    
+    const payload = {
+      nomeAnimal: formData.nomeAnimal,
+      tipo: formData.tipo as 'cao' | 'gato',
+      nomeTutor: formData.nomeTutor,
+      dataVacinacao: formData.dataVacinacao || new Date().toISOString(),
+      localVacinacao: formData.localVacinacao,
+      area: formData.area,
+      quadra: formData.quadra,
+      loteVacina: formData.loteVacina,
+      dosePerdida: !!formData.dosePerdida,
+      endereco: formData.endereco || null,
+      latitude: isNaN(latitude as number) ? null : latitude,
+      longitude: isNaN(longitude as number) ? null : longitude,
+    };
+    
+    // Envia os dados para o componente pai
+    onSubmit(payload);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
