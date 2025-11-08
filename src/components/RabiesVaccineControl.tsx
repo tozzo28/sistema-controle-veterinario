@@ -72,14 +72,21 @@ const RabiesVaccineControl: React.FC = () => {
             try {
               if (editingRecord?.id) {
                 // Editar registro existente
-                console.log('🔄 Atualizando vacinação:', editingRecord.id, formData);
-                await updateRabies(editingRecord.id, formData);
-                console.log('✅ Vacinação atualizada com sucesso');
+                console.log('🔄 [CONTROL] Iniciando atualização de vacinação');
+                console.log('🔄 [CONTROL] ID do registro:', editingRecord.id);
+                console.log('🔄 [CONTROL] Dados do formulário:', formData);
+                
+                const updated = await updateRabies(editingRecord.id, formData);
+                console.log('✅ [CONTROL] Vacinação atualizada com sucesso no backend');
+                console.log('✅ [CONTROL] Dados retornados:', updated);
+                
+                // Aguardar um pouco para garantir que tudo foi processado
+                await new Promise(resolve => setTimeout(resolve, 500));
               } else {
                 // Criar novo registro
-                console.log('➕ Criando nova vacinação:', formData);
+                console.log('➕ [CONTROL] Criando nova vacinação:', formData);
                 await createRabies(formData);
-                console.log('✅ Vacinação criada com sucesso');
+                console.log('✅ [CONTROL] Vacinação criada com sucesso');
               }
               
               // Fechar o modal
@@ -87,10 +94,13 @@ const RabiesVaccineControl: React.FC = () => {
               setEditingRecord(null);
               
               // Recarregar a página para atualizar a lista e estatísticas
+              console.log('🔄 [CONTROL] Recarregando página para atualizar dados...');
               window.location.reload();
-            } catch (error) {
-              console.error('❌ Erro ao salvar vacinação:', error);
-              alert('Erro ao salvar vacinação. Tente novamente.');
+            } catch (error: any) {
+              console.error('❌ [CONTROL] Erro completo ao salvar vacinação:', error);
+              console.error('❌ [CONTROL] Mensagem de erro:', error?.message);
+              console.error('❌ [CONTROL] Stack:', error?.stack);
+              alert(`Erro ao salvar vacinação:\n${error?.message || error}\n\nVerifique o console para mais detalhes.`);
             }
           }}
           initialData={editingRecord}
