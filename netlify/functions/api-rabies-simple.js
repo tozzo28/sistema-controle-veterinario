@@ -99,6 +99,41 @@ exports.handler = async (event, context) => {
       const data = JSON.parse(event.body);
       const { id, ...updateData } = data;
       
+      // Verificar se as colunas existem, se não, tentar adicioná-las
+      try {
+        const columnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_name = 'rabies_vaccine_records' 
+          AND column_name = 'idade'
+        `);
+        
+        if (columnCheck.rows.length === 0) {
+          console.log('⚠️ [PUT] Colunas faltantes detectadas, adicionando...');
+          // Adicionar colunas faltantes
+          const columnsToAdd = [
+            { name: 'idade', type: 'VARCHAR(50)' },
+            { name: 'raca', type: 'VARCHAR(100)' },
+            { name: 'sexo', type: 'VARCHAR(20)' },
+            { name: 'cpf', type: 'VARCHAR(20)' },
+            { name: 'telefone', type: 'VARCHAR(20)' },
+            { name: 'veterinario', type: 'VARCHAR(255)' },
+            { name: 'clinica', type: 'VARCHAR(255)' }
+          ];
+          
+          for (const column of columnsToAdd) {
+            try {
+              await client.query(`ALTER TABLE rabies_vaccine_records ADD COLUMN IF NOT EXISTS "${column.name}" ${column.type}`);
+              console.log(`✅ [PUT] Coluna ${column.name} adicionada`);
+            } catch (colError) {
+              console.warn(`⚠️ [PUT] Erro ao adicionar coluna ${column.name}:`, colError.message);
+            }
+          }
+        }
+      } catch (checkError) {
+        console.warn('⚠️ [PUT] Erro ao verificar colunas:', checkError.message);
+      }
+      
       // Converter dataVacinacao para Date se fornecida e válida
       let dataVacinacao = null;
       if (updateData.dataVacinacao) {
