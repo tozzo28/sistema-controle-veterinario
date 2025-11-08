@@ -16,10 +16,16 @@ const RabiesVaccineControl: React.FC = () => {
   const [vaccinationRecords, setVaccinationRecords] = useState([]);
 
   const [stats, setStats] = useState({ total: 0, caes: 0, gatos: 0, dosesPerdidas: 0 });
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Função para recarregar dados sem recarregar a página
+  const refreshData = () => {
+    setRefreshKey(prev => prev + 1);
+  };
 
   useEffect(() => {
     fetch('/.netlify/functions/api-rabies-stats-simple').then(r => r.json()).then(setStats).catch(() => setStats({ total: 0, caes: 0, gatos: 0, dosesPerdidas: 0 }));
-  }, []);
+  }, [refreshKey]);
 
   useEffect(() => {
     // Carregar registros de vacinação para o mapa
@@ -37,7 +43,7 @@ const RabiesVaccineControl: React.FC = () => {
         console.error('❌ Erro ao carregar vacinações:', error);
         setVaccinationRecords([]);
       });
-  }, []);
+  }, [refreshKey]);
 
   return (
     <div className="space-y-6">
@@ -79,9 +85,6 @@ const RabiesVaccineControl: React.FC = () => {
                 const updated = await updateRabies(editingRecord.id, formData);
                 console.log('✅ [CONTROL] Vacinação atualizada com sucesso no backend');
                 console.log('✅ [CONTROL] Dados retornados:', updated);
-                
-                // Aguardar um pouco para garantir que tudo foi processado
-                await new Promise(resolve => setTimeout(resolve, 500));
               } else {
                 // Criar novo registro
                 console.log('➕ [CONTROL] Criando nova vacinação:', formData);
@@ -93,9 +96,9 @@ const RabiesVaccineControl: React.FC = () => {
               setShowForm(false);
               setEditingRecord(null);
               
-              // Recarregar a página para atualizar a lista e estatísticas
-              console.log('🔄 [CONTROL] Recarregando página para atualizar dados...');
-              window.location.reload();
+              // Atualizar lista e estatísticas sem recarregar a página
+              console.log('🔄 [CONTROL] Atualizando dados sem recarregar página...');
+              refreshData();
             } catch (error: any) {
               console.error('❌ [CONTROL] Erro completo ao salvar vacinação:', error);
               console.error('❌ [CONTROL] Mensagem de erro:', error?.message);
@@ -154,6 +157,7 @@ const RabiesVaccineControl: React.FC = () => {
           onlyLost={onlyLost}
           onEdit={(record) => setEditingRecord(record)}
           onView={(record) => setViewingRecord(record)}
+          refreshKey={refreshKey}
         />
       </div>
 

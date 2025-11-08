@@ -8,23 +8,26 @@ interface RabiesVaccineListProps {
   onlyLost?: boolean;
   onEdit?: (record: RabiesVaccineRecord) => void;
   onView?: (record: RabiesVaccineRecord) => void;
+  refreshKey?: number;
 }
 
-const RabiesVaccineList: React.FC<RabiesVaccineListProps> = ({ searchTerm, filterType, onlyLost = false, onEdit, onView }) => {
+const RabiesVaccineList: React.FC<RabiesVaccineListProps> = ({ searchTerm, filterType, onlyLost = false, onEdit, onView, refreshKey = 0 }) => {
   const [rows, setRows] = useState<RabiesVaccineRecord[]>([]);
-  const [refreshKey, setRefreshKey] = useState(0);
 
-  // Recarregar lista quando a página receber foco (após edição)
+  // Recarregar lista quando refreshKey mudar ou quando a página receber foco
   useEffect(() => {
-    const handleFocus = () => {
+    const loadData = () => {
       fetchRabies().then(setRows).catch(() => setRows([]));
+    };
+    
+    loadData();
+    
+    // Também recarregar quando a página receber foco (útil se editar em outra aba)
+    const handleFocus = () => {
+      loadData();
     };
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
-  }, []);
-
-  useEffect(() => {
-    fetchRabies().then(setRows).catch(() => setRows([]));
   }, [refreshKey]);
 
   const getAnimalIcon = (tipo: string) => {
@@ -131,7 +134,8 @@ const RabiesVaccineList: React.FC<RabiesVaccineListProps> = ({ searchTerm, filte
                     onClick={async () => {
                       if (confirm(`Tem certeza que deseja excluir a vacinação de ${vacinacao.nomeAnimal}?`)) {
                         await deleteRabies(vacinacao.id);
-                        setRows(prev => prev.filter(r => r.id !== vacinacao.id));
+                        // Recarregar dados do servidor
+                        fetchRabies().then(setRows).catch(() => setRows([]));
                       }
                     }} 
                     className="text-red-600 hover:text-red-900"
