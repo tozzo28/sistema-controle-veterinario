@@ -61,11 +61,23 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose, onSubmit
       ? null 
       : (typeof formData.longitude === 'string' ? parseFloat(formData.longitude) : formData.longitude);
     
+    // Preparar dataVacinacao - se não fornecida e estiver editando, manter a atual
+    let dataVacinacao = formData.dataVacinacao;
+    if (!dataVacinacao) {
+      if (initialData?.dataVacinacao) {
+        // Se estiver editando e não forneceu nova data, usar a data atual do registro
+        dataVacinacao = new Date(initialData.dataVacinacao).toISOString().split('T')[0];
+      } else {
+        // Se criando novo registro, usar data atual
+        dataVacinacao = new Date().toISOString().split('T')[0];
+      }
+    }
+    
     const payload = {
       nomeAnimal: formData.nomeAnimal,
       tipo: formData.tipo as 'cao' | 'gato',
       nomeTutor: formData.nomeTutor,
-      dataVacinacao: formData.dataVacinacao || new Date().toISOString(),
+      dataVacinacao: dataVacinacao,
       localVacinacao: formData.localVacinacao,
       area: formData.area,
       quadra: formData.quadra,
@@ -75,6 +87,8 @@ const RabiesVaccineForm: React.FC<RabiesVaccineFormProps> = ({ onClose, onSubmit
       latitude: isNaN(latitude as number) ? null : latitude,
       longitude: isNaN(longitude as number) ? null : longitude,
     };
+    
+    console.log('📦 [FORM] Payload preparado:', payload);
     
     // Envia os dados para o componente pai
     onSubmit(payload);

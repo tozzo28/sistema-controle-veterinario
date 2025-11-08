@@ -56,29 +56,27 @@ exports.handler = async (event, context) => {
       const data = JSON.parse(event.body);
       const { id, ...updateData } = data;
       
-      console.log('🔄 [PUT] Atualizando registro ID:', id);
-      console.log('🔄 [PUT] Dados recebidos:', updateData);
-      
-      // Converter dataVacinacao para Date se fornecida, senão manter a atual
-      let dataVacinacao = updateData.dataVacinacao ? new Date(updateData.dataVacinacao) : null;
-      if (dataVacinacao && isNaN(dataVacinacao.getTime())) {
-        // Se a data fornecida é inválida, buscar a data atual do registro
-        const currentRecord = await client.query('SELECT "dataVacinacao" FROM rabies_vaccine_records WHERE id = $1', [id]);
-        dataVacinacao = currentRecord.rows.length > 0 && currentRecord.rows[0].dataVacinacao 
-          ? currentRecord.rows[0].dataVacinacao 
-          : new Date();
-      } else if (!dataVacinacao) {
-        // Se não foi fornecida, buscar a data atual do registro
-        const currentRecord = await client.query('SELECT "dataVacinacao" FROM rabies_vaccine_records WHERE id = $1', [id]);
-        dataVacinacao = currentRecord.rows.length > 0 && currentRecord.rows[0].dataVacinacao 
-          ? currentRecord.rows[0].dataVacinacao 
-          : new Date();
+      // Converter dataVacinacao para Date se fornecida e válida
+      let dataVacinacao = null;
+      if (updateData.dataVacinacao) {
+        try {
+          // Tentar converter a data - pode vir como string "YYYY-MM-DD" ou ISO
+          dataVacinacao = new Date(updateData.dataVacinacao);
+          // Verificar se a data é válida
+          if (isNaN(dataVacinacao.getTime())) {
+            dataVacinacao = null;
+          }
+        } catch (e) {
+          dataVacinacao = null;
+        }
       }
+      
+      // Se não há data válida, manter a data atual do registro (usando COALESCE no SQL)
       
       const result = await client.query(`
         UPDATE rabies_vaccine_records 
         SET "nomeAnimal" = $1, "tipo" = $2, "nomeTutor" = $3, 
-            "dataVacinacao" = $4,
+            "dataVacinacao" = COALESCE($4, "dataVacinacao"),
             "localVacinacao" = $5, "loteVacina" = $6, "quadra" = $7, 
             "area" = $8, "dosePerdida" = $9, "endereco" = $10, 
             "latitude" = $11, "longitude" = $12
@@ -92,8 +90,6 @@ exports.handler = async (event, context) => {
         updateData.longitude ? parseFloat(updateData.longitude) : null,
         id
       ]);
-      
-      console.log('✅ [PUT] Registro atualizado:', result.rows[0]);
       
       return {
         statusCode: 200,
