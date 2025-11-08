@@ -85,20 +85,27 @@ const RabiesVaccineControl: React.FC = () => {
                 const updated = await updateRabies(editingRecord.id, formData);
                 console.log('✅ [CONTROL] Vacinação atualizada com sucesso no backend');
                 console.log('✅ [CONTROL] Dados retornados:', updated);
+                
+                // Aguardar um pouco para garantir que o backend processou completamente
+                await new Promise(resolve => setTimeout(resolve, 300));
               } else {
                 // Criar novo registro
                 console.log('➕ [CONTROL] Criando nova vacinação:', formData);
                 await createRabies(formData);
                 console.log('✅ [CONTROL] Vacinação criada com sucesso');
+                
+                // Aguardar um pouco para garantir que o backend processou completamente
+                await new Promise(resolve => setTimeout(resolve, 300));
               }
               
-              // Fechar o modal
+              // Fechar o modal primeiro
               setShowForm(false);
               setEditingRecord(null);
               
               // Atualizar lista e estatísticas sem recarregar a página
-              console.log('🔄 [CONTROL] Atualizando dados sem recarregar página...');
+              console.log('🔄 [CONTROL] Atualizando lista e estatísticas...');
               refreshData();
+              console.log('✅ [CONTROL] Dados atualizados na interface');
             } catch (error: any) {
               console.error('❌ [CONTROL] Erro completo ao salvar vacinação:', error);
               console.error('❌ [CONTROL] Mensagem de erro:', error?.message);

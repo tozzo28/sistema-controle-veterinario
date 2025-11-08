@@ -16,8 +16,17 @@ const RabiesVaccineList: React.FC<RabiesVaccineListProps> = ({ searchTerm, filte
 
   // Recarregar lista quando refreshKey mudar ou quando a página receber foco
   useEffect(() => {
-    const loadData = () => {
-      fetchRabies().then(setRows).catch(() => setRows([]));
+    const loadData = async () => {
+      console.log('🔄 [LIST] Carregando lista de vacinações...');
+      try {
+        const data = await fetchRabies();
+        console.log('✅ [LIST] Lista carregada com', data.length, 'registros');
+        console.log('✅ [LIST] Dados:', data.map(r => ({ id: r.id, nomeAnimal: r.nomeAnimal, nomeTutor: r.nomeTutor })));
+        setRows(data);
+      } catch (error) {
+        console.error('❌ [LIST] Erro ao carregar lista:', error);
+        setRows([]);
+      }
     };
     
     loadData();
