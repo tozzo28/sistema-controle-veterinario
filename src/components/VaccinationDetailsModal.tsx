@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, MapPin, Calendar, User, Phone, Shield } from 'lucide-react';
+import { X, MapPin, Calendar, User, Phone, Shield, Stethoscope, Building } from 'lucide-react';
 import { RabiesVaccineRecord } from '../api';
 
 interface VaccinationDetailsModalProps {
@@ -61,6 +61,30 @@ const VaccinationDetailsModal: React.FC<VaccinationDetailsModalProps> = ({ recor
                 </label>
                 <div className="mt-1">{getTipoAnimalBadge(record.tipo)}</div>
               </div>
+              {record.idade && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Idade
+                  </label>
+                  <p className="text-sm text-gray-900 dark:text-white">{record.idade}</p>
+                </div>
+              )}
+              {record.raca && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Raça
+                  </label>
+                  <p className="text-sm text-gray-900 dark:text-white">{record.raca}</p>
+                </div>
+              )}
+              {record.sexo && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Sexo
+                  </label>
+                  <p className="text-sm text-gray-900 dark:text-white capitalize">{record.sexo}</p>
+                </div>
+              )}
             </div>
           </section>
 
@@ -77,19 +101,40 @@ const VaccinationDetailsModal: React.FC<VaccinationDetailsModalProps> = ({ recor
                 </label>
                 <p className="text-sm text-gray-900 dark:text-white">{record.nomeTutor}</p>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Endereço
-                </label>
-                <p className="text-sm text-gray-900 dark:text-white">{record.endereco || 'Não informado'}</p>
-              </div>
+              {record.cpf && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    CPF
+                  </label>
+                  <p className="text-sm text-gray-900 dark:text-white">{record.cpf}</p>
+                </div>
+              )}
+              {record.telefone && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Telefone
+                  </label>
+                  <p className="text-sm text-gray-900 dark:text-white flex items-center">
+                    <Phone className="h-3 w-3 mr-1" />
+                    {record.telefone}
+                  </p>
+                </div>
+              )}
+              {record.endereco && (
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Endereço
+                  </label>
+                  <p className="text-sm text-gray-900 dark:text-white">{record.endereco}</p>
+                </div>
+              )}
             </div>
           </section>
 
           {/* Informações da Vacinação */}
           <section>
             <h4 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-3 sm:mb-4 flex items-center">
-              <Shield className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-green-600" />
+              <Shield className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-purple-600" />
               Informações da Vacinação
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -134,6 +179,28 @@ const VaccinationDetailsModal: React.FC<VaccinationDetailsModalProps> = ({ recor
                   )}
                 </p>
               </div>
+              {record.veterinario && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Veterinário
+                  </label>
+                  <p className="text-sm text-gray-900 dark:text-white flex items-center">
+                    <Stethoscope className="h-3 w-3 mr-1" />
+                    {record.veterinario}
+                  </p>
+                </div>
+              )}
+              {record.clinica && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Clínica
+                  </label>
+                  <p className="text-sm text-gray-900 dark:text-white flex items-center">
+                    <Building className="h-3 w-3 mr-1" />
+                    {record.clinica}
+                  </p>
+                </div>
+              )}
             </div>
           </section>
 
