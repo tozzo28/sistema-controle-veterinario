@@ -16,13 +16,26 @@ const RabiesVaccineList: React.FC<RabiesVaccineListProps> = ({ searchTerm, filte
 
   // Recarregar lista quando refreshKey mudar ou quando a página receber foco
   useEffect(() => {
+    console.log('🔄 [LIST] useEffect executado, refreshKey:', refreshKey);
+    
     const loadData = async () => {
       console.log('🔄 [LIST] Carregando lista de vacinações...');
       try {
         const data = await fetchRabies();
         console.log('✅ [LIST] Lista carregada com', data.length, 'registros');
-        console.log('✅ [LIST] Dados:', data.map(r => ({ id: r.id, nomeAnimal: r.nomeAnimal, nomeTutor: r.nomeTutor })));
+        console.log('✅ [LIST] Dados completos:', data);
+        console.log('✅ [LIST] Resumo:', data.map(r => ({ id: r.id, nomeAnimal: r.nomeAnimal, nomeTutor: r.nomeTutor, localVacinacao: r.localVacinacao, area: r.area, quadra: r.quadra })));
+        
+        // Verificar se há dados atualizados
+        const updatedRecord = data.find(r => r.id === 2); // ID que está sendo editado
+        if (updatedRecord) {
+          console.log('✅ [LIST] Registro ID 2 encontrado:', updatedRecord);
+        } else {
+          console.warn('⚠️ [LIST] Registro ID 2 não encontrado na lista!');
+        }
+        
         setRows(data);
+        console.log('✅ [LIST] Estado atualizado com', data.length, 'registros');
       } catch (error) {
         console.error('❌ [LIST] Erro ao carregar lista:', error);
         setRows([]);
@@ -33,6 +46,7 @@ const RabiesVaccineList: React.FC<RabiesVaccineListProps> = ({ searchTerm, filte
     
     // Também recarregar quando a página receber foco (útil se editar em outra aba)
     const handleFocus = () => {
+      console.log('🔄 [LIST] Página recebeu foco, recarregando...');
       loadData();
     };
     window.addEventListener('focus', handleFocus);

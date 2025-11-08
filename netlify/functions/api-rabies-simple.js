@@ -22,7 +22,19 @@ exports.handler = async (event, context) => {
     await client.connect();
     
     if (event.httpMethod === 'GET') {
+      console.log('📥 [GET] Buscando todos os registros de vacinação...');
       const result = await client.query('SELECT * FROM rabies_vaccine_records ORDER BY id DESC');
+      
+      console.log('✅ [GET] Registros encontrados:', result.rows.length);
+      result.rows.forEach(row => {
+        console.log('📋 [GET] Registro ID', row.id, ':', {
+          nomeAnimal: row.nomeAnimal,
+          nomeTutor: row.nomeTutor,
+          localVacinacao: row.localVacinacao,
+          area: row.area,
+          quadra: row.quadra,
+        });
+      });
       
       return {
         statusCode: 200,
@@ -117,14 +129,33 @@ exports.handler = async (event, context) => {
       }
       
       console.log('✅ [PUT] UPDATE executado com sucesso');
-      console.log('✅ [PUT] Dados atualizados:', {
+      console.log('✅ [PUT] Dados retornados pelo UPDATE:', {
         id: result.rows[0].id,
         nomeAnimal: result.rows[0].nomeAnimal,
         nomeTutor: result.rows[0].nomeTutor,
         localVacinacao: result.rows[0].localVacinacao,
         area: result.rows[0].area,
         quadra: result.rows[0].quadra,
+        loteVacina: result.rows[0].loteVacina,
+        endereco: result.rows[0].endereco,
+        latitude: result.rows[0].latitude,
+        longitude: result.rows[0].longitude,
       });
+      
+      // Verificar diretamente no banco se os dados foram realmente salvos
+      const verifyResult = await client.query('SELECT * FROM rabies_vaccine_records WHERE id = $1', [id]);
+      if (verifyResult.rows.length > 0) {
+        console.log('✅ [PUT] Verificação no banco - dados confirmados:', {
+          id: verifyResult.rows[0].id,
+          nomeAnimal: verifyResult.rows[0].nomeAnimal,
+          nomeTutor: verifyResult.rows[0].nomeTutor,
+          localVacinacao: verifyResult.rows[0].localVacinacao,
+          area: verifyResult.rows[0].area,
+          quadra: verifyResult.rows[0].quadra,
+        });
+      } else {
+        console.error('❌ [PUT] ERRO: Registro não encontrado no banco após UPDATE!');
+      }
       
       return {
         statusCode: 200,

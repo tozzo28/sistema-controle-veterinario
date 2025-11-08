@@ -73,9 +73,15 @@ export type RabiesVaccineRecord = {
 };
 
 export async function fetchRabies(): Promise<RabiesVaccineRecord[]> {
+  console.log('📡 [API] Buscando lista de vacinações...');
   const res = await fetch(`${BASE_URL}/.netlify/functions/api-rabies-simple`);
-  if (!res.ok) throw new Error('Falha ao carregar vacinações');
-  return res.json();
+  if (!res.ok) {
+    console.error('❌ [API] Erro ao buscar vacinações:', res.status, res.statusText);
+    throw new Error('Falha ao carregar vacinações');
+  }
+  const data = await res.json();
+  console.log('✅ [API] Lista recebida do backend:', data.length, 'registros');
+  return data;
 }
 
 export async function createRabies(data: Omit<RabiesVaccineRecord, 'id' | 'dataVacinacao'>): Promise<RabiesVaccineRecord> {

@@ -20,7 +20,12 @@ const RabiesVaccineControl: React.FC = () => {
 
   // Função para recarregar dados sem recarregar a página
   const refreshData = () => {
-    setRefreshKey(prev => prev + 1);
+    console.log('🔄 [CONTROL] refreshData chamado, incrementando refreshKey...');
+    setRefreshKey(prev => {
+      const newKey = prev + 1;
+      console.log('🔄 [CONTROL] refreshKey atualizado:', prev, '->', newKey);
+      return newKey;
+    });
   };
 
   useEffect(() => {
